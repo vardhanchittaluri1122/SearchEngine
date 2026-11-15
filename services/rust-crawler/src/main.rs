@@ -267,7 +267,14 @@ async fn main() -> Result<()> {
         .route("/internal/v1/index/complete", post(complete_index_shard))
         .route("/internal/v1/index/progress", get(index_progress))
         .with_state(state);
-    let address = env::var("CRAWLER_LISTEN_ADDR").unwrap_or_else(|_| "127.0.0.1:8081".to_string());
+    // Render sets PORT for each service. Keep the current localhost default for
+    // local Docker development, while allowing an explicit address to override it.
+    let address = env::var("CRAWLER_LISTEN_ADDR").unwrap_or_else(|_| {
+        match env::var("PORT") {
+            Ok(port) if !port.trim().is_empty() => format!("0.0.0.0:{port}"),
+            _ => "127.0.0.1:8081".to_string(),
+        }
+    });
     let listener = tokio::net::TcpListener::bind(&address)
         .await
         .with_context(|| format!("could not bind crawler service to {address}"))?;

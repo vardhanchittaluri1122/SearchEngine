@@ -58,7 +58,8 @@ func main() {
 	mux.HandleFunc("GET /health", s.health)
 	mux.HandleFunc("POST /api/v1/search", s.search)
 	mux.HandleFunc("POST /api/v1/pages/extract", s.extractPage)
-	addr := env("LISTEN_ADDR", ":8080")
+	// Render provides PORT; retain :8080 for local development.
+	addr := env("LISTEN_ADDR", ":"+env("PORT", "8080"))
 	log.Printf("Go orchestrator listening on %s; technology crawler=%s; health crawler=%s; discovery=%s; embedding=%s", addr, crawlerURLs["technology"], crawlerURLs["health"], discoveryURL, embeddingURL)
 	if err := http.ListenAndServe(addr, mux); err != nil {
 		log.Fatal(err)

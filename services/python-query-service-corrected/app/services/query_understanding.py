@@ -49,7 +49,12 @@ def load_sector_classifier() -> None:
         return
     with _model_lock:
         if _model is None:
-            model = SentenceTransformer(MODEL_NAME)
+            import torch
+
+            torch.set_num_threads(1)
+            torch.set_num_interop_threads(1)
+            model = SentenceTransformer(MODEL_NAME, device="cpu")
+            model.max_seq_length = 128
             embeddings = model.encode(
                 list(SECTORS.values()),
                 convert_to_tensor=True,

@@ -1,0 +1,34 @@
+# Python
+**/.venv/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local environment files and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+
+# Generated files and caches
+**/target/
+**/bin/
+**/.gocache/
+**/.cc-duckdb-tmp/
+**/.cache/
+*.exe
+*.dll
+*.so
+*.dylib
+*.log
+*.zip
+.vercel/
+.vscode/
+.DS_Store
+Thumbs.db

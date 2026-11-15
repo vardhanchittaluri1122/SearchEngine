@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SearchEngine — Technology &amp; Health</title>
+<style>
+
+:root{--navy:#071a3b;--blue:#1262ed;--ink:#102144;--line:#d7e0f0;--muted:#53627e;--green:#20bd63;--paper:#f7f9fd}*{box-sizing:border-box}body{margin:0;font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper)}button,input{font:inherit}.app{min-height:100vh;display:grid;grid-template-columns:176px minmax(0,1fr)}.sidebar{background:#08152b;color:#eaf1ff;display:flex;flex-direction:column;padding:22px 12px;min-height:100vh;border-right:1px solid #294063}.brand{height:142px;text-align:center;border-bottom:1px solid #293b58;padding:4px 0 18px}.brand-mark{font-size:48px;line-height:1;color:#168dff;text-shadow:0 0 18px #0879ff}.brand strong{display:block;font-size:19px;margin-top:7px}.brand small{color:#c4d2ee}.nav{display:grid;gap:8px;margin-top:24px}.nav a{padding:13px 12px;border-radius:11px;color:#d6e0f4;text-decoration:none;display:flex;gap:12px;align-items:center}.nav a.active{background:linear-gradient(110deg,#1479f8,#0954db);color:white;font-weight:650}.nav .ico{font-size:19px;width:24px;text-align:center}.theme{margin:24px auto 0;background:#152748;border-radius:22px;padding:7px 12px;color:#d9e5ff}.powered{margin-top:auto;border:1px solid #284779;border-radius:12px;padding:15px 12px;background:linear-gradient(150deg,#10254c,#07152c);font-size:12px;color:#d4def5}.powered b{font-size:20px;display:block;margin-bottom:3px}.main{min-width:0}.hero{position:relative;overflow:hidden;min-height:400px;padding:26px clamp(24px,4.5vw,72px) 30px;color:white;background:radial-gradient(ellipse at 79% 45%,#0c3473 0,#0a2250 30%,transparent 58%),linear-gradient(115deg,#091a3c,#061a3e 60%,#05265a)}.hero:before,.hero:after{content:"";position:absolute;border:1px solid rgba(37,144,255,.28);border-radius:50%;width:390px;height:190px;right:5%;top:110px;transform:rotate(-22deg);pointer-events:none}.hero:after{width:430px;height:230px;transform:rotate(31deg);right:3%;top:94px}.topline{position:absolute;top:20px;right:30px;font-size:12px;display:flex;gap:16px;align-items:center;color:#e0e9fa}.online{color:#54ef89}.online:before{content:"";display:inline-block;width:14px;height:14px;background:#31e576;border-radius:50%;vertical-align:-2px;margin-right:8px}.hero-content{position:relative;z-index:1;max-width:950px;padding-top:34px}.hero h1{font-size:clamp(32px,3.2vw,50px);line-height:1.13;letter-spacing:-1.5px;margin:0 0 12px;font-weight:750}.tech{color:#28a4ff}.health{color:#36df79}.hero p{font-size:20px;margin:0 0 24px;color:#edf4ff}.search{height:59px;max-width:925px;border-radius:32px;background:white;display:flex;align-items:center;padding:5px 6px 5px 22px;box-shadow:0 8px 30px #020b1e55;position:relative;z-index:3}.search-icon{font-size:27px;color:#294774;margin-right:16px}.search input{border:0;outline:0;min-width:0;flex:1;color:#172b50;background:transparent;font-size:16px}.search button{height:49px;border:0;border-radius:28px;padding:0 31px;background:linear-gradient(110deg,#1672f5,#0b5be4);color:white;font-weight:700;font-size:17px;cursor:pointer;min-width:178px;transition:filter .2s,transform .2s}.search button:hover{filter:brightness(1.1)}.search button:active{transform:scale(.98)}.search button span{font-size:23px;margin-left:10px}.chips{display:flex;gap:12px;align-items:center;margin:24px 0 0 34px;flex-wrap:wrap}.chip{border:1px solid #345282;border-radius:28px;padding:11px 21px;color:#eaf2ff;background:#142b56;font-weight:600;cursor:pointer}.chip.selected.techchip{background:#0865e9;border-color:#2380ff}.chip.selected.healthchip{background:#138333;border-color:#31d666}.chip .ico{font-size:19px;margin-right:9px}.chip-sep{height:42px;width:1px;background:#7890b5;margin:0 16px}.globe{position:absolute;right:12%;top:73px;width:270px;height:270px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#b6edff 0,#57b9ff 13%,#1172e3 38%,#083b8a 66%,#061f56 78%);box-shadow:inset -20px -14px 35px #021337aa,0 0 52px #137df477;border:2px solid #378cff}.globe:before{content:"";position:absolute;inset:13px;border-radius:50%;background:repeating-linear-gradient(90deg,transparent 0 37px,#9ce3ff5c 39px 41px,transparent 43px 72px),repeating-linear-gradient(0deg,transparent 0 28px,#9ce3ff40 30px 32px,transparent 34px 58px);filter:drop-shadow(0 0 5px #3abaff);clip-path:circle(50%)}.globe:after{content:"";position:absolute;inset:45px 62px;border-radius:50%;border:1px solid #b4ecff99;transform:rotate(-20deg);box-shadow:22px 3px 0 -1px #b4ecff66,-22px 3px 0 -1px #b4ecff66}.orb-label{position:absolute;right:2%;top:92px;border:1px solid #138cff;border-radius:24px;background:#0b2b61e8;padding:12px 17px;font-weight:650;z-index:2}.orb-label.healthlabel{top:193px;right:6%;background:#0a573d;border-color:#23db77}.content{padding:14px 15px 25px;display:grid;grid-template-columns:minmax(185px,220px) minmax(380px,1fr) minmax(220px,285px);gap:18px;align-items:start}.panel,.toolbar,.result-card{background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 6px #10255008}.filter-head,.summary-head{padding:13px 16px;border-bottom:1px solid var(--line);font-weight:750}.filter-body{padding:14px 16px}.filter-body h3{font-size:15px;margin:0 0 9px}.filter-group{margin-bottom:18px}.check{display:flex;gap:9px;align-items:center;margin:8px 0}.check input{accent-color:#1264ec;width:18px;height:18px}.select{width:100%;border:1px solid #cbd6e8;background:#fff;border-radius:8px;padding:8px;color:#233655}.clear{width:100%;margin-top:5px;border:1px solid #5284df;background:#f7faff;border-radius:8px;color:#1255c2;padding:10px;cursor:pointer;font-weight:650}.toolbar{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;color:#435371;margin-bottom:12px;gap:10px}.viewbuttons{display:flex;align-items:center;gap:7px}.viewbuttons button{border:1px solid #cfdaeb;background:#fff;border-radius:7px;padding:7px 10px;color:#1a396d;cursor:pointer}.viewbuttons button.active{color:#fff;background:#1262ed;border-color:#1262ed}.results{display:grid;gap:12px}.result-card{display:grid;grid-template-columns:minmax(125px,185px) minmax(180px,1fr) 150px;gap:16px;padding:12px;align-items:center}.thumb{height:130px;border-radius:9px;display:grid;place-items:center;color:#fff;font-size:42px;text-shadow:0 2px 6px #0008;background:radial-gradient(circle at 70% 30%,#1975b9,#061836 72%)}.thumb.food{background:radial-gradient(circle at 50%,#e8bd60,#477334 46%,#d9d1be 70%)}.thumb.cloud{background:radial-gradient(circle at 50% 40%,#53c3ff,#114d9b 52%,#06183b)}.result-copy h2{font-size:19px;color:#104ca7;margin:0 0 8px}.badges{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:6px}.badge{font-size:12px;border-radius:15px;padding:3px 9px;background:#e9f5ee;color:#177a3e;font-weight:650}.badge.blue{background:#edf2ff;color:#354db2}.result-copy p{margin:5px 0;color:#263b5d}.url{color:#1552a7;font-size:13px;overflow-wrap:anywhere}.score{border-radius:9px;background:#eef8f2;padding:12px;font-size:14px;text-align:center;color:#244b3b}.score strong{display:block;font-size:21px;color:#13773e}.domain{border-top:1px solid #d7e7dc;margin-top:9px;padding-top:8px;color:#314868}.rightcol{display:grid;gap:13px}.summary-head{background:#f7f8fd}.summary-body{padding:13px 16px}.stat{display:flex;justify-content:space-between;gap:6px;margin:0 0 10px}.stat b{color:#164ea7}.verified{border-top:1px solid var(--line);padding-top:12px;color:#187a43;font-size:13px}.features{padding:13px 16px}.features h3{margin:0 0 10px}.features div{margin:8px 0}.rocket{padding:13px;border-radius:10px;background:linear-gradient(110deg,#e4edff,#cbdcff);text-align:center;font-weight:700}.rocket small{display:block;font-weight:500}.empty{padding:34px;text-align:center;color:var(--muted);background:white;border:1px solid var(--line);border-radius:10px}.results.grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}.results.grid .result-card{grid-template-columns:1fr}.results.grid .thumb{height:155px}.results.grid .score{display:flex;justify-content:space-around;align-items:center}.results.grid .domain{border:0;margin:0;padding:0}@media(max-width:1100px){.content{grid-template-columns:190px minmax(0,1fr)}.rightcol{grid-column:1/-1;grid-template-columns:repeat(3,1fr)}.globe{right:7%;opacity:.62}.hero-content{max-width:760px}.result-card{grid-template-columns:145px minmax(160px,1fr) 130px}}@media(max-width:760px){.app{grid-template-columns:1fr}.sidebar{min-height:0;padding:10px 14px;display:flex;flex-direction:row;align-items:center;gap:14px;border-right:0;border-bottom:1px solid #294063}.brand{height:auto;border:0;padding:0;display:flex;align-items:center;gap:8px;text-align:left}.brand-mark{font-size:31px}.brand strong{font-size:16px;margin:0}.brand small,.theme,.powered{display:none}.nav{display:flex;gap:3px;margin:0 0 0 auto}.nav a{padding:8px;border-radius:8px}.nav a span:last-child{display:none}.nav .ico{font-size:18px}.hero{padding:36px 20px 26px;min-height:370px}.topline{top:10px;right:16px;font-size:10px}.hero-content{padding-top:23px}.hero h1{font-size:clamp(30px,7vw,43px)}.hero p{font-size:16px}.globe{width:190px;height:190px;top:135px;right:-45px;opacity:.24}.orb-label{display:none}.search{height:auto;min-height:56px;padding-left:15px}.search-icon{font-size:22px;margin-right:9px}.search input{font-size:14px}.search button{min-width:48px;width:52px;padding:0;font-size:0;height:46px}.search button span{font-size:22px;margin:0}.chips{margin:18px 0 0;gap:7px}.chip{padding:8px 12px;font-size:13px}.chip-sep{display:none}.content{grid-template-columns:1fr;padding:12px;gap:12px}.filters{display:none}.rightcol{grid-column:auto;grid-template-columns:1fr 1fr}.rightcol .rocket{grid-column:1/-1}.toolbar{font-size:13px}.result-card{grid-template-columns:105px minmax(0,1fr);gap:11px;padding:10px}.thumb{height:100px;font-size:32px}.result-copy h2{font-size:16px}.result-copy p{font-size:13px}.score{grid-column:1/-1;display:flex;justify-content:space-around;align-items:center;padding:8px}.score strong{display:inline;font-size:17px}.domain{border:0;margin:0;padding:0}.results.grid{grid-template-columns:1fr}}@media(max-width:440px){.nav a{padding:7px 5px}.sidebar{gap:6px}.brand strong{font-size:14px}.online{display:none}.topline{gap:0}.toolbar{align-items:flex-start;flex-direction:column}.viewbuttons{align-self:flex-end;margin-top:-3px}.rightcol{grid-template-columns:1fr}.rightcol .rocket{grid-column:auto}.hero h1{font-size:30px}.search button{min-width:44px;width:44px}.chip{padding:7px 9px}.result-card{grid-template-columns:85px minmax(0,1fr)}.thumb{height:86px}.result-copy h2{font-size:15px}}
+
+.hero{min-height:350px}.hero-content{max-width:960px}.hero p{max-width:750px}.content{grid-template-columns:minmax(185px,220px) minmax(380px,1fr) minmax(220px,285px)}.filters .filter-body p{color:var(--muted);margin:8px 0}.summary-value{overflow-wrap:anywhere}.status-message{margin:0 0 12px;padding:12px 15px;border-radius:9px;background:#eef4ff;color:#184b9b}.status-message.error{background:#fff0ef;color:#a42b22}.status-message[hidden]{display:none}.candidate-note{font-size:12px;color:#6b5b2a}.search button:disabled{opacity:.65;cursor:wait}.empty{white-space:pre-wrap}@media(max-width:760px){.content{grid-template-columns:1fr}.filters{display:none}}
+.result-section{display:grid;gap:12px;margin-bottom:20px}.result-section-title{font-size:18px;color:#15345f;margin:4px 2px}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">⌕</span><div><strong>SearchEngine</strong><small>Smart. Relevant. Fast.</small></div></div>
+    <nav class="nav"><a class="active" href="#home"><span class="ico">⌂</span><span>Search</span></a></nav>
+    <div class="theme">Technology + Health</div>
+    <div class="powered"><b>▤</b>Powered by<br>Python • Go • Rust<br>Common Crawl + pgvector</div>
+  </aside>
+  <main class="main" id="home">
+    <section class="hero">
+      <div class="topline"><span class="online">API search</span><span>│</span><span>Live results from your services</span></div>
+      <div class="globe"></div>
+      <div class="orb-label">▣　Technology</div><div class="orb-label healthlabel">♡　Health</div>
+      <div class="hero-content">
+        <h1>Search Across <span class="tech">Tech</span> &amp; <span class="health">Health</span><br>with AI-Powered Intelligence</h1>
+        <p>Ask a question. Your query is analyzed and routed to the matching search service.</p>
+        <form class="search" id="searchForm">
+          <span class="search-icon">⌕</span>
+          <input id="query" type="search" placeholder="Ask a question, e.g. What is SQL?" aria-label="Search question" required>
+          <button id="searchButton" type="submit">Search <span>➜</span></button>
+        </form>
+        <div class="chips" role="group" aria-label="Sector selection">
+          <button class="chip selected" type="button" data-sector="auto" aria-pressed="true"><span class="ico">ϟ</span>Auto Detect</button>
+          <button class="chip techchip" type="button" data-sector="technology" aria-pressed="false"><span class="ico">▣</span>Technology</button>
+          <button class="chip healthchip" type="button" data-sector="health" aria-pressed="false"><span class="ico">♥</span>Health</button>
+        </div>
+      </div>
+    </section>
+    <section class="content">
+      <aside class="panel filters">
+        <div class="filter-head">How search works</div>
+        <div class="filter-body">
+          <div class="filter-group"><h3>1. Analyze</h3><p>Python extracts query details and identifies the topic.</p></div>
+          <div class="filter-group"><h3>2. Route</h3><p>Go chooses the technology or health database.</p></div>
+          <div class="filter-group"><h3>3. Search</h3><p>Rust searches stored records and Common Crawl metadata.</p></div>
+          <button class="clear" id="clearSearch" type="button">Clear Search</button>
+        </div>
+      </aside>
+      <div>
+        <div class="toolbar"><span id="resultCount">Enter a question to search.</span><div class="viewbuttons">Source: your API</div></div>
+        <div id="status" class="status-message" role="status" hidden></div>
+        <div class="results" id="results"><div class="empty">Your real search results will appear here.</div></div>
+      </div>
+      <aside class="rightcol">
+        <div class="panel">
+          <div class="summary-head">◉　Search Summary</div>
+          <div class="summary-body">
+            <div class="stat"><span>Query</span><b class="summary-value" id="summaryQuery">—</b></div>
+            <div class="stat"><span>Intent</span><b class="summary-value" id="summaryIntent">—</b></div>
+            <div class="stat"><span>Sector</span><b class="summary-value" id="summarySector">—</b></div>
+            <div class="stat"><span>Topic</span><b class="summary-value" id="summaryTopic">—</b></div>
+            <div class="stat"><span>Results</span><b class="summary-value" id="summaryCount">0</b></div>
+            <div class="verified" id="summarySource">Results are provided by your running search services.</div>
+          </div>
+        </div>
+        <div class="panel features"><h3>Project services</h3><div>Python · query analysis</div><div>Go · service routing</div><div>Rust · database and crawl</div></div>
+        <div class="rocket">🚀　SearchEngine<small>Technology and health search</small></div>
+      </aside>
+    </section>
+  </main>
+</div>
+<script>
+'use strict';
+const form=document.querySelector('#searchForm');
+const input=document.querySelector('#query');
+const button=document.querySelector('#searchButton');
+const results=document.querySelector('#results');
+const statusBox=document.querySelector('#status');
+let selectedSector=null;
+
+function setStatus(message='',isError=false){
+  statusBox.textContent=message;
+  statusBox.hidden=!message;
+  statusBox.classList.toggle('error',isError);
+}
+function safePageUrl(value){
+  try{const parsed=new URL(value);return ['http:','https:'].includes(parsed.protocol)?parsed.href:null}catch{return null}
+}
+function makeBadge(text,blue=false){const badge=document.createElement('span');badge.className=blue?'badge blue':'badge';badge.textContent=text;return badge}
+function makeCard(item,{candidate=false,sector=''}={}){
+  const domain=String(item.domain||'').trim();
+  const pageUrl=safePageUrl(item.url||'');
+  const fallbackUrl=domain?safePageUrl('https://'+domain):null;
+  const card=document.createElement('article');card.className='result-card';
+  const thumb=document.createElement('div');thumb.className='thumb '+(sector==='health'?'food':'cloud');thumb.textContent=sector==='health'?'♡':'⌕';card.append(thumb);
+  const copy=document.createElement('div');copy.className='result-copy';
+  const title=document.createElement('h2');title.textContent=String(item.title||domain||'Search result');copy.append(title);
+  const badges=document.createElement('div');badges.className='badges';badges.append(makeBadge(candidate?'Candidate domain':'Common Crawl URL'),makeBadge(sector||'unknown sector',true));copy.append(badges);
+  const description=document.createElement('p');description.textContent=String(item.snippet||item.description||(candidate?'A candidate domain was discovered; no matching page URL was returned yet.':'Archived URL metadata found. Page text has not been extracted.'));copy.append(description);
+  const urlLabel=document.createElement('div');urlLabel.className='url';
+  const href=pageUrl||fallbackUrl;
+  if(href){const link=document.createElement('a');link.href=href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=pageUrl||('Open '+domain);urlLabel.append(link)}else{urlLabel.textContent=String(item.url||domain||'URL unavailable')}
+  copy.append(urlLabel);card.append(copy);
+  const score=document.createElement('div');score.className='score';
+  const scoreText=document.createElement('div');scoreText.textContent='Source';const source=document.createElement('strong');source.textContent=candidate?'Candidate':'Common Crawl';scoreText.append(source);score.append(scoreText);
+  const domainBox=document.createElement('div');domainBox.className='domain';domainBox.textContent='◎ Domain\n'+(domain||'unknown');score.append(domainBox);card.append(score);
+  return card;
+}
+function renderResponse(payload,query){
+  const analysis=payload.analysis||{};
+  const result=payload.results||{};
+  const websites=Array.isArray(result.websites)?result.websites:[];
+  const candidateMap=new Map();
+  for(const raw of [...(Array.isArray(result.candidate_domains)?result.candidate_domains:[]),...(Array.isArray(payload.discovery?.domains)?payload.discovery.domains:[])]){
+    const candidate=typeof raw==='string'?{domain:raw}:raw;
+    const key=String(candidate?.domain||'').trim().toLowerCase();
+    if(key&&!candidateMap.has(key))candidateMap.set(key,candidate);
+  }
+  const candidateList=[...candidateMap.values()];
+  const sector=String(result.sector||analysis.sector||'');
+  results.replaceChildren();
+  if(websites.length){
+    const section=document.createElement('section');section.className='result-section';
+    const heading=document.createElement('h2');heading.className='result-section-title';heading.textContent=`Website results (${websites.length})`;section.append(heading);
+    websites.forEach(item=>section.append(makeCard(item,{sector:String(item.category||sector)})));
+    results.append(section);
+  }
+  if(candidateList.length){
+    const section=document.createElement('section');section.className='result-section';
+    const heading=document.createElement('h2');heading.className='result-section-title';heading.textContent=`Candidate domains (${candidateList.length})`;section.append(heading);
+    const note=document.createElement('p');note.className='candidate-note';note.textContent='Candidates are domains suggested for this query. They are shown separately from domains with returned page URLs.';section.append(note);
+    candidateList.forEach(item=>section.append(makeCard(item,{candidate:true,sector})));
+    results.append(section);
+  }
+  if(!websites.length&&!candidateList.length){
+    const empty=document.createElement('div');empty.className='empty';empty.textContent=String(result.message||'No matching pages were returned. Try another question.');results.append(empty);
+  }
+  const count=websites.length;
+  document.querySelector('#resultCount').textContent=`${count} website result${count===1?'':'s'} · ${candidateList.length} candidate domain${candidateList.length===1?'':'s'}`;
+  document.querySelector('#summaryQuery').textContent=String(analysis.original_query||query||'—');
+  document.querySelector('#summaryIntent').textContent=String(analysis.intent||'—');
+  document.querySelector('#summarySector').textContent=sector||'—';
+  const topic=analysis.topic?String(analysis.topic):'—';
+  const similarity=Number(analysis.topic_similarity);
+  document.querySelector('#summaryTopic').textContent=Number.isFinite(similarity)?`${topic} (${Math.round(similarity*100)}% similarity)`:topic;
+  document.querySelector('#summaryCount').textContent=`${count} websites · ${candidateList.length} candidates`;
+  const source=String(result.source||payload.discovery?.method||'search service');
+  document.querySelector('#summarySource').textContent=`Search source: ${source}. ${String(result.status||'')}`.trim();
+}
+async function submitSearch(query){
+  setStatus('Searching your Python, Go, and Rust services…');
+  button.disabled=true;button.textContent='Searching…';
+  document.querySelector('#resultCount').textContent='Searching…';
+  try{
+    const body={query};if(selectedSector)body.sector=selectedSector;
+    const response=await fetch('/api/v1/query/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const payload=await response.json().catch(()=>({detail:'The API returned a non-JSON response.'}));
+    if(!response.ok)throw new Error(payload.detail||`Search failed (${response.status}). Check the Python, Go, and Rust service windows.`);
+    renderResponse(payload,query);setStatus('Search complete.');
+  }catch(error){setStatus(error.message||'Could not reach the search API. Confirm the services are running.',true);results.replaceChildren();const empty=document.createElement('div');empty.className='empty';empty.textContent='Search failed. Check the service windows for the first error.';results.append(empty);document.querySelector('#resultCount').textContent='Search failed';}
+  finally{button.disabled=false;button.innerHTML='Search <span>➜</span>';}
+}
+form.addEventListener('submit',event=>{event.preventDefault();const query=input.value.trim();if(query)submitSearch(query)});
+document.querySelectorAll('[data-sector]').forEach(chip=>chip.addEventListener('click',()=>{
+  selectedSector=chip.dataset.sector==='auto'?null:chip.dataset.sector;
+  document.querySelectorAll('[data-sector]').forEach(other=>{const active=other===chip;other.classList.toggle('selected',active);other.setAttribute('aria-pressed',String(active));});
+}));
+document.querySelector('#clearSearch').addEventListener('click',()=>{input.value='';results.innerHTML='<div class="empty">Your real search results will appear here.</div>';setStatus();document.querySelector('#resultCount').textContent='Enter a question to search.';document.querySelector('#summaryQuery').textContent='—';document.querySelector('#summaryIntent').textContent='—';document.querySelector('#summarySector').textContent='—';document.querySelector('#summaryTopic').textContent='—';document.querySelector('#summaryCount').textContent='0';document.querySelector('#summarySource').textContent='Results are provided by your running search services.';});
+</script>
+</body>
+</html>

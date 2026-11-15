@@ -64,7 +64,7 @@ The same code supports both environments. Locally, Rust reads `services\\rust-cr
 
 ### Render database settings
 
-Deploy two separate Rust services from this repository, both with **Root Directory** `services/rust-crawler`, **Build Command** `cargo build --release`, and **Start Command** `./target/release/rust-crawler`. Leave `CRAWLER_LISTEN_ADDR` unset so the service listens on Render's `PORT`.
+Deploy two separate **Private Services** from this repository, both with **Root Directory** `services/rust-crawler`, **Build Command** `cargo build --release`, and **Start Command** `./target/release/rust-crawler`. Set `CRAWLER_LISTEN_ADDR=0.0.0.0:10000` in each private service.
 
 In each Rust service's **Environment** page, add:
 
@@ -77,16 +77,16 @@ DB_PASSWORD=<current Render database password>
 
 Set `DB_NAME=searchengine_db` on the technology Rust service, and `DB_NAME=searchengine_health` on the health Rust service. Both use the same Render database host and credentials. Use the **internal** database hostname because the Rust services run on Render; do not paste the full URL into `DB_HOST`. Keep the password in Render's Environment settings only. Local `.env` settings remain for Docker; the Render values do not change your local database connection.
 
-Deploy the Go orchestrator as a separate Render service from root directory `services/go-orchestrator`, with build command `go build -o app .` and start command `./app`. Leave `LISTEN_ADDR` unset so Go uses Render's `PORT`. Set these environment variables to the **internal service URLs** shown by Render after deploying the services:
+Deploy the Go orchestrator as a **Private Service** from root directory `services/go-orchestrator`, with build command `go build -o app .` and start command `./app`. Set `LISTEN_ADDR=:10000`. Set these environment variables to the **internal service addresses** shown by Render after deploying the services (private services use port `10000` here):
 
 ```text
-CRAWLER_TECHNOLOGY_URL=http://<rust-technology-private-host>:<port>/api/v1/search
-CRAWLER_HEALTH_URL=http://<rust-health-private-host>:<port>/api/v1/search
-COMMONCRAWL_DISCOVERY_URL=http://<python-private-host>:<port>/internal/v1/commoncrawl/discover
-COMMONCRAWL_EMBED_URLS=http://<python-private-host>:<port>/internal/v1/commoncrawl/embed-urls
+CRAWLER_TECHNOLOGY_URL=http://<rust-technology-private-host>:10000/api/v1/search
+CRAWLER_HEALTH_URL=http://<rust-health-private-host>:10000/api/v1/search
+COMMONCRAWL_DISCOVERY_URL=http://<python-host>:10000/internal/v1/commoncrawl/discover
+COMMONCRAWL_EMBED_URLS=http://<python-host>:10000/internal/v1/commoncrawl/embed-urls
 ```
 
-Deploy Python from root directory `services/python-query-service-corrected`, with build command `pip install -r requirements.txt` and start command `uvicorn app.main:app --host 0.0.0.0 --port $PORT`. Set `GO_ORCHESTRATOR_URL=http://<go-private-host>:<port>/api/v1/search`. Keep Python and Go in the same Render region as the Rust services. Add the actual Render private hostnames and ports in these URL values after creating the services.
+Deploy Python as a **Web Service** from root directory `services/python-query-service-corrected`, with build command `pip install -r requirements.txt` and start command `uvicorn app.main:app --host 0.0.0.0 --port $PORT`. Set `GO_ORCHESTRATOR_URL=http://<go-private-host>:10000/api/v1/search`. Keep Python and Go in the same Render region as the Rust services. Add the actual Render private hostnames in these URL values after creating the services. For Python's internal URLs in the Go settings, use the Python service's internal hostname with port `10000`.
 
 After each service deploys, check its Render **Logs**. Rust should log a successful database connection and listener startup; Go and Python should show their HTTP listeners. If Rust says the database does not exist or permission is denied, check `DB_NAME`, `DB_USER`, and that this role owns or has access to that database. Creating the Render databases by itself does not configure these service variables.
 

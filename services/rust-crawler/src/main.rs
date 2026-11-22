@@ -1,6 +1,6 @@
 use anyhow::{anyhow, bail, Context, Result};
 use axum::{
-    extract::{Query, State},
+    extract::{Path, Query, State},
     http::StatusCode,
     response::{IntoResponse, Response},
     routing::{get, post},
@@ -17,7 +17,7 @@ use std::{
     sync::Arc,
     time::Duration,
 };
-use tokio::sync::Semaphore;
+use tokio::sync::{Mutex, Semaphore};
 use tokio_postgres::{Client as PgClient, NoTls};
 
 const COLLINFO_URL: &str = "https://index.commoncrawl.org/collinfo.json";
@@ -31,6 +31,9 @@ const MAX_TEXT_CHARS: usize = 50_000;
 #[derive(Clone)]
 struct AppState {
     db: Arc<PgClient>,
+    database_config: Arc<DatabaseConfig>,
+    initialized_databases: Arc<Mutex<HashSet<String>>>,
+    database_semaphore: Arc<Semaphore>,
     http: Client,
     configured_index: Option<String>,
     record_limit: usize,
@@ -39,7 +42,7 @@ struct AppState {
     domain_similarity_threshold: f32,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct SearchRequest {
     #[serde(default)]
     original_query: String,
@@ -54,6 +57,12 @@ struct SearchRequest {
     #[serde(default)]
     sector: Option<String>,
     #[serde(default)]
+    sector_group: Option<String>,
+    #[serde(default)]
+    sector_id: Option<String>,
+    #[serde(default)]
+    database_name: Option<String>,
+    #[serde(default)]
     keywords: Vec<String>,
     /// The normal search path stores only Common Crawl capture metadata. Page
     /// bodies are intentionally fetched only through an explicit detail call.
@@ -63,9 +72,11 @@ struct SearchRequest {
     query_embedding: Vec<f32>,
     #[serde(default)]
     url_embeddings: Vec<UrlEmbeddingInput>,
+    #[serde(default)]
+    defer_crawl: bool,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct UrlEmbeddingInput {
     url: String,
     embedding: Vec<f32>,
@@ -76,13 +87,24 @@ struct ExtractRequest {
     url: String,
     #[serde(default)]
     sector: Option<String>,
+    #[serde(default)]
+    database_name: Option<String>,
+}
+
+#[derive(Clone)]
+struct DatabaseConfig {
+    host: String,
+    port: u16,
+    user: String,
+    password: String,
+    default_database: String,
 }
 
 fn default_true() -> bool {
     true
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 enum CandidateDomainInput {
     Name(String),
@@ -136,6 +158,13 @@ struct Website {
     crawl_timestamp: Option<String>,
     warc_filename: Option<String>,
     warc_offset: Option<i64>,
+    related_links: Vec<RelatedLink>,
+}
+
+#[derive(Debug, Serialize)]
+struct RelatedLink {
+    url: String,
+    anchor_text: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -218,6 +247,12 @@ struct IndexProgressQuery {
     sector: String,
 }
 
+#[derive(Debug, Deserialize)]
+struct CrawlJobDatabaseQuery {
+    database_name: String,
+    sector_group: Option<String>,
+}
+
 #[derive(Debug)]
 struct ApiError(StatusCode, String);
 
@@ -230,7 +265,8 @@ impl IntoResponse for ApiError {
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenvy::dotenv().ok();
-    let db = connect_database().await?;
+    let database_config = database_config_from_env()?;
+    let db = connect_database_to(&database_config, &database_config.default_database).await?;
     ensure_metadata_schema(&db).await?;
     let domain_similarity_threshold = env::var("CC_DOMAIN_SIMILARITY_THRESHOLD")
         .unwrap_or_else(|_| "0.35".to_string())
@@ -241,6 +277,15 @@ async fn main() -> Result<()> {
     }
     let state = AppState {
         db: Arc::new(db),
+        database_config: Arc::new(database_config.clone()),
+        initialized_databases: Arc::new(Mutex::new(HashSet::from([
+            database_config.default_database.clone(),
+        ]))),
+        database_semaphore: Arc::new(Semaphore::new(parse_limit(
+            "DB_MAX_ACTIVE_REQUESTS",
+            20,
+            100,
+        )?)),
         http: Client::builder()
             .timeout(Duration::from_secs(180))
             .user_agent("SearchEngineWork-rust-crawler/0.2 (Common Crawl index client)")
@@ -261,6 +306,8 @@ async fn main() -> Result<()> {
     let app = Router::new()
         .route("/health", get(health))
         .route("/api/v1/search", post(search))
+        .route("/api/v1/crawl-jobs", post(create_crawl_job))
+        .route("/api/v1/crawl-jobs/:job_id", get(crawl_job_status))
         .route("/api/v1/pages/extract", post(extract_page))
         .route("/internal/v1/index/sectors", post(index_sectors))
         .route("/internal/v1/index/batch", post(index_batch))
@@ -289,6 +336,120 @@ async fn health() -> Json<serde_json::Value> {
     Json(serde_json::json!({"status":"healthy","service":"rust-crawler"}))
 }
 
+async fn create_crawl_job(
+    State(state): State<AppState>,
+    Json(mut input): Json<SearchRequest>,
+) -> Result<Json<serde_json::Value>, ApiError> {
+    if input.candidate_domains.is_empty() {
+        return Err(ApiError(StatusCode::BAD_REQUEST, "candidate_domains is required".to_string()));
+    }
+    input.defer_crawl = false;
+    input.metadata_only = false;
+    let sector = input.sector_group.clone().or_else(|| input.sector.clone());
+    let (db, _permit) = connect_request_database(
+        &state,
+        sector.as_deref(),
+        input.database_name.as_deref(),
+    )
+    .await
+    .map_err(internal_error)?;
+    let database_name = input.database_name.clone().unwrap_or_else(|| state.database_config.default_database.clone());
+    let query_key = if input.normalized_query.trim().is_empty() {
+        input.original_query.to_lowercase()
+    } else {
+        input.normalized_query.to_lowercase()
+    };
+    if let Some(row) = db.query_opt(
+        "SELECT id,status FROM public.async_crawl_jobs WHERE payload::jsonb->>'database_name'=$1 AND lower(payload::jsonb->>'normalized_query')=$2 AND status IN ('queued','running') AND updated_at > NOW()-INTERVAL '15 minutes' ORDER BY id DESC LIMIT 1",
+        &[&database_name, &query_key],
+    ).await.map_err(|error| internal_error(error.into()))? {
+        let job_id: i64 = row.get(0);
+        let status: String = row.get(1);
+        return Ok(Json(serde_json::json!({"job_id":job_id,"status":status})));
+    }
+    let payload = serde_json::to_string(&input)
+        .map_err(|error| internal_error(error.into()))?;
+    let row = db.query_one(
+        "INSERT INTO public.async_crawl_jobs (status, payload, created_at, updated_at) VALUES ('queued',$1,NOW(),NOW()) RETURNING id",
+        &[&payload],
+    ).await.map_err(|error| internal_error(error.into()))?;
+    let job_id: i64 = row.get(0);
+    tokio::spawn(run_crawl_job(state.clone(), job_id, input));
+    Ok(Json(serde_json::json!({"job_id":job_id,"status":"queued"})))
+}
+
+async fn run_crawl_job(state: AppState, job_id: i64, input: SearchRequest) {
+    let sector = input.sector_group.clone().or_else(|| input.sector.clone());
+    let database_name = input.database_name.clone();
+    let (db, permit) = match connect_request_database(
+        &state,
+        sector.as_deref(),
+        database_name.as_deref(),
+    ).await {
+        Ok(connection) => connection,
+        Err(error) => {
+            eprintln!("Could not start Common Crawl job {job_id}: {error:#}");
+            return;
+        }
+    };
+    if let Err(error) = db.execute(
+        "UPDATE public.async_crawl_jobs SET status='running', updated_at=NOW() WHERE id=$1",
+        &[&job_id],
+    ).await {
+        eprintln!("Could not mark Common Crawl job {job_id} running: {error}");
+        return;
+    }
+    drop(permit);
+    drop(db);
+
+    let result = search(State(state.clone()), Json(input)).await;
+    let (status, result_json, last_error) = match result {
+        Ok(Json(response)) => match serde_json::to_string(&response) {
+            Ok(json) => ("completed", Some(json), None),
+            Err(error) => ("failed", None, Some(error.to_string())),
+        },
+        Err(error) => ("failed", None, Some(error.1)),
+    };
+    match connect_request_database(&state, sector.as_deref(), database_name.as_deref()).await {
+        Ok((db, _permit)) => {
+            if let Err(error) = db.execute(
+                "UPDATE public.async_crawl_jobs SET status=$1, result_json=$2, last_error=$3, updated_at=NOW(), completed_at=NOW() WHERE id=$4",
+                &[&status, &result_json, &last_error, &job_id],
+            ).await {
+                eprintln!("Could not save Common Crawl job {job_id} result: {error}");
+            }
+        }
+        Err(error) => eprintln!("Could not save Common Crawl job {job_id} status: {error:#}"),
+    }
+}
+
+async fn crawl_job_status(
+    State(state): State<AppState>,
+    Path(job_id): Path<i64>,
+    Query(query): Query<CrawlJobDatabaseQuery>,
+) -> Result<Json<serde_json::Value>, ApiError> {
+    let (db, _permit) = connect_request_database(
+        &state,
+        query.sector_group.as_deref(),
+        Some(&query.database_name),
+    )
+    .await
+    .map_err(internal_error)?;
+    let row = db.query_opt(
+        "SELECT status, result_json, last_error FROM public.async_crawl_jobs WHERE id=$1",
+        &[&job_id],
+    ).await.map_err(|error| internal_error(error.into()))?
+        .ok_or_else(|| ApiError(StatusCode::NOT_FOUND, "crawl job not found".to_string()))?;
+    let status: String = row.get(0);
+    let result_json: Option<String> = row.get(1);
+    let last_error: Option<String> = row.get(2);
+    let result = result_json
+        .map(|value| serde_json::from_str::<serde_json::Value>(&value))
+        .transpose()
+        .map_err(|error| internal_error(error.into()))?;
+    Ok(Json(serde_json::json!({"job_id":job_id,"status":status,"result":result,"error":last_error})))
+}
+
 async fn index_sectors(
     State(state): State<AppState>,
     Json(input): Json<SectorEmbeddingsRequest>,
@@ -297,7 +458,9 @@ async fn index_sectors(
     for sector in input.sectors {
         validate_index_sector(&sector.sector)?;
         let vector = embedding_literal(&sector.embedding)?;
-        state.db.execute(
+        let (db, _permit) = connect_request_database(&state, Some(&sector.sector), None)
+            .await.map_err(internal_error)?;
+        db.execute(
             r#"INSERT INTO public.cc_index_sectors (sector, description, embedding, model_name, updated_at)
                VALUES ($1,$2,$3::text::vector,'BAAI/bge-small-en-v1.5',NOW())
                ON CONFLICT (sector) DO UPDATE SET description=EXCLUDED.description,
@@ -320,8 +483,9 @@ async fn index_batch(
             "collection and shard_path are required".to_string(),
         ));
     }
-    state
-        .db
+    let (db, _permit) = connect_request_database(&state, Some(&input.sector), None)
+        .await.map_err(internal_error)?;
+    db
         .execute(
             r#"INSERT INTO public.cc_index_shards
            (collection_name, shard_path, sector, status, started_at, updated_at)
@@ -373,7 +537,7 @@ async fn index_batch(
         let payload = serde_json::Value::Array(wire_domains);
         let payload = serde_json::to_string(&payload)
             .map_err(|error| ApiError(StatusCode::BAD_REQUEST, error.to_string()))?;
-        state.db.execute(
+        db.execute(
             r#"WITH batch AS (
                  SELECT * FROM jsonb_to_recordset($1::jsonb)
                  AS x(domain text, sector_score real, embedding text, sample_urls jsonb)
@@ -387,7 +551,7 @@ async fn index_batch(
                  classification_status='candidate', processed_at=NOW()"#,
             &[&payload, &input.sector, &input.collection],
         ).await.map_err(|error| internal_error(error.into()))?;
-        state.db.execute(
+        db.execute(
             r#"WITH domain_rows AS (
                  SELECT * FROM jsonb_to_recordset($1::jsonb)
                  AS x(domain text, sample_urls jsonb)
@@ -409,7 +573,7 @@ async fn index_batch(
             &[&payload, &input.sector, &input.collection],
         ).await.map_err(|error| internal_error(error.into()))?;
     }
-    state.db.execute(
+    db.execute(
         r#"UPDATE public.cc_index_shards SET domain_count=GREATEST(domain_count,$4), updated_at=NOW()
            WHERE collection_name=$1 AND shard_path=$2 AND sector=$3"#,
         &[&input.collection, &input.shard_path, &input.sector, &input.domain_count],
@@ -430,7 +594,9 @@ async fn complete_index_shard(
             "status must be completed or failed".to_string(),
         ));
     }
-    state.db.execute(
+    let (db, _permit) = connect_request_database(&state, Some(&input.sector), None)
+        .await.map_err(internal_error)?;
+    db.execute(
         r#"INSERT INTO public.cc_index_shards
            (collection_name, shard_path, sector, status, domain_count, last_error, started_at, updated_at, completed_at)
            VALUES ($1,$2,$3,$4,$5,$6,NOW(),NOW(),CASE WHEN $4='completed' THEN NOW() ELSE NULL END)
@@ -451,7 +617,9 @@ async fn index_progress(
     Query(query): Query<IndexProgressQuery>,
 ) -> Result<Json<serde_json::Value>, ApiError> {
     validate_index_sector(&query.sector)?;
-    let rows = state.db.query(
+    let (db, _permit) = connect_request_database(&state, Some(&query.sector), None)
+        .await.map_err(internal_error)?;
+    let rows = db.query(
         "SELECT shard_path FROM public.cc_index_shards WHERE collection_name=$1 AND sector=$2 AND status='completed' ORDER BY shard_path",
         &[&query.collection, &query.sector],
     ).await.map_err(|error| internal_error(error.into()))?;
@@ -462,10 +630,13 @@ async fn index_progress(
 }
 
 fn validate_index_sector(sector: &str) -> Result<(), ApiError> {
-    if sector != "technology" && sector != "health" {
+    if sector.is_empty()
+        || sector.len() > 50
+        || !sector.chars().all(|character| character.is_ascii_lowercase() || character.is_ascii_digit() || character == '_')
+    {
         return Err(ApiError(
             StatusCode::BAD_REQUEST,
-            "sector must be technology or health".to_string(),
+            "sector must be a lowercase sector id using letters, numbers, and underscores".to_string(),
         ));
     }
     Ok(())
@@ -501,6 +672,15 @@ async fn extract_page(
         ));
     }
     let sector = normalize_sector(input.sector);
+    let (db, _db_permit) = connect_request_database(
+        &state,
+        sector.as_deref(),
+        input.database_name.as_deref(),
+    )
+    .await
+    .map_err(internal_error)?;
+    let mut state = state;
+    state.db = Arc::new(db);
     let row = state
         .db
         .query_opt(
@@ -597,30 +777,69 @@ fn preview_lines(text: &str, limit: usize, width: usize) -> Vec<String> {
     lines
 }
 
-async fn connect_database() -> Result<PgClient> {
-    let host = env::var("DB_HOST").unwrap_or_else(|_| "localhost".to_string());
+fn database_config_from_env() -> Result<DatabaseConfig> {
+    let host = env::var("DB_HOST").unwrap_or_else(|_| "localhost".to_string()).trim().to_string();
     let port = env::var("DB_PORT")
         .unwrap_or_else(|_| "5432".to_string())
         .parse::<u16>()
         .context("DB_PORT must be a valid port number")?;
-    let name = env::var("DB_NAME").context("DB_NAME is required in .env")?;
-    let user = env::var("DB_USER").context("DB_USER is required in .env")?;
-    let password = env::var("DB_PASSWORD").context("DB_PASSWORD is required in .env")?;
+    let user = env::var("DB_USER").context("DB_USER is required in .env")?.trim().to_string();
+    let password = env::var("DB_PASSWORD").context("DB_PASSWORD is required in .env")?.trim().to_string();
+    let default_database = env::var("DB_NAME").context("DB_NAME is required in .env")?.trim().to_string();
+    Ok(DatabaseConfig { host, port, user, password, default_database })
+}
+
+async fn connect_database_to(config: &DatabaseConfig, name: &str) -> Result<PgClient> {
     let (client, connection) = tokio_postgres::Config::new()
-        .host(&host)
-        .port(port)
-        .dbname(&name)
-        .user(&user)
-        .password(&password)
+        .host(&config.host)
+        .port(config.port)
+        .dbname(name)
+        .user(&config.user)
+        .password(&config.password)
         .connect(NoTls)
         .await
-        .with_context(|| format!("could not connect to PostgreSQL at {host}:{port}/{name}"))?;
+        .with_context(|| format!("could not connect to PostgreSQL database {name}"))?;
     tokio::spawn(async move {
         if let Err(error) = connection.await {
             eprintln!("PostgreSQL connection ended: {error}");
         }
     });
     Ok(client)
+}
+
+fn database_for_sector(sector: Option<&str>, requested: Option<&str>, default: &str) -> Result<String> {
+    let name = requested.map(str::trim).filter(|v| !v.is_empty()).map(str::to_string)
+        .unwrap_or_else(|| {
+            let sector = sector.map(str::trim).unwrap_or("").to_ascii_lowercase();
+            match sector.as_str() {
+                "health" => "searchengine_health".to_string(),
+                "technology" => "searchengine_db".to_string(),
+                "" => default.to_string(),
+                _ => format!("searchengine_{sector}"),
+            }
+        });
+    if name.len() > 63 || !name.starts_with("searchengine_")
+        || !name.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_')
+    {
+        bail!("database_name must be a lowercase searchengine_* database name");
+    }
+    Ok(name)
+}
+
+async fn connect_request_database(state: &AppState, sector: Option<&str>, requested: Option<&str>) -> Result<(PgClient, tokio::sync::OwnedSemaphorePermit)> {
+    let name = database_for_sector(sector, requested, &state.database_config.default_database)?;
+    let permit = state.database_semaphore.clone().acquire_owned().await
+        .context("database concurrency limiter is closed")?;
+    let client = connect_database_to(&state.database_config, &name).await?;
+    {
+        let mut initialized = state.initialized_databases.lock().await;
+        if !initialized.contains(&name) {
+            ensure_metadata_schema(&client).await
+                .with_context(|| format!("could not initialize metadata tables in {name}"))?;
+            initialized.insert(name);
+        }
+    }
+    Ok((client, permit))
 }
 
 fn parse_limit(name: &str, default: usize, max: usize) -> Result<usize> {
@@ -642,7 +861,17 @@ async fn search(
     // Natural-language queries often contain multiple distinct entities (for
     // example, Java AND Python). Match any keyword, then rank relevant pages.
     let keyword_query = keywords.join(" OR ");
-    let sector = normalize_sector(input.sector.take());
+    let sector = normalize_sector(input.sector_group.take().or_else(|| input.sector.take()));
+    let index_sector = input.sector_id.clone().or_else(|| sector.clone());
+    let (db, _db_permit) = connect_request_database(
+        &state,
+        sector.as_deref(),
+        input.database_name.as_deref(),
+    )
+    .await
+    .map_err(internal_error)?;
+    let mut state = state;
+    state.db = Arc::new(db);
     let query_embedding = if input.query_embedding.is_empty() {
         None
     } else {
@@ -657,7 +886,7 @@ async fn search(
         Some(input.query_embedding.clone())
     };
     if !input.url_embeddings.is_empty() {
-        let Some(target_sector) = sector.as_deref() else {
+        let Some(target_sector) = index_sector.as_deref() else {
             return Err(ApiError(
                 StatusCode::BAD_REQUEST,
                 "sector is required with url_embeddings".to_string(),
@@ -748,7 +977,7 @@ async fn search(
     }
     if candidate_domains.is_empty() && requested_domain.is_none() && registered_domains.is_empty() {
         if let (Some(target_sector), Some(embedding)) =
-            (sector.as_deref(), query_embedding.as_deref())
+            (index_sector.as_deref(), query_embedding.as_deref())
         {
             candidate_domains = db_semantic_domain_candidates(
                 &state.db,
@@ -761,7 +990,7 @@ async fn search(
         }
     }
 
-    if let (Some(target_sector), Some(embedding)) = (sector.as_deref(), query_embedding.as_deref())
+    if let (Some(target_sector), Some(embedding)) = (index_sector.as_deref(), query_embedding.as_deref())
     {
         let candidate_names: Vec<String> = candidate_domains
             .iter()
@@ -814,7 +1043,7 @@ async fn search(
         }
     }
 
-    if websites.len() < TOP_K as usize && !targets.is_empty() {
+    if !input.defer_crawl && websites.len() < TOP_K as usize && !targets.is_empty() {
         let (collection, index_url) = selected_index(&state, input.index_collection.as_deref())
             .await
             .map_err(internal_error)?;
@@ -974,6 +1203,66 @@ async fn ensure_metadata_schema(db: &PgClient) -> Result<()> {
     db.batch_execute(
         r#"
         CREATE EXTENSION IF NOT EXISTS vector;
+        CREATE TABLE IF NOT EXISTS public.domains (
+            id BIGSERIAL PRIMARY KEY,
+            domain_name TEXT NOT NULL UNIQUE,
+            category TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        CREATE TABLE IF NOT EXISTS public.crawl_sources (
+            id BIGSERIAL PRIMARY KEY,
+            collection_name TEXT NOT NULL,
+            record_type TEXT NOT NULL,
+            manifest_path TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        CREATE TABLE IF NOT EXISTS public.crawl_jobs (
+            id BIGSERIAL PRIMARY KEY,
+            seed_url TEXT NOT NULL,
+            collection_name TEXT NOT NULL,
+            status TEXT NOT NULL,
+            pages_processed INTEGER NOT NULL DEFAULT 0,
+            pages_failed INTEGER NOT NULL DEFAULT 0,
+            started_at TIMESTAMPTZ,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            completed_at TIMESTAMPTZ
+        );
+        CREATE TABLE IF NOT EXISTS public.async_crawl_jobs (
+            id BIGSERIAL PRIMARY KEY,
+            status TEXT NOT NULL DEFAULT 'queued',
+            payload TEXT NOT NULL,
+            result_json TEXT,
+            last_error TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            completed_at TIMESTAMPTZ
+        );
+        CREATE TABLE IF NOT EXISTS public.web_pages (
+            id BIGSERIAL PRIMARY KEY,
+            domain_id BIGINT REFERENCES public.domains(id),
+            crawl_source_id BIGINT REFERENCES public.crawl_sources(id),
+            url TEXT NOT NULL,
+            title TEXT,
+            description TEXT,
+            content TEXT,
+            content_hash TEXT,
+            language TEXT,
+            crawl_timestamp TEXT,
+            warc_filename TEXT,
+            warc_offset BIGINT,
+            warc_length BIGINT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        CREATE INDEX IF NOT EXISTS web_pages_url_idx ON public.web_pages (url);
+        CREATE INDEX IF NOT EXISTS web_pages_domain_id_idx ON public.web_pages (domain_id);
+        CREATE TABLE IF NOT EXISTS public.page_links (
+            id BIGSERIAL PRIMARY KEY,
+            source_page_id BIGINT NOT NULL REFERENCES public.web_pages(id),
+            target_page_id BIGINT REFERENCES public.web_pages(id),
+            target_url TEXT NOT NULL,
+            anchor_text TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
         CREATE TABLE IF NOT EXISTS public.common_crawl_urls (
             id BIGSERIAL PRIMARY KEY,
             sector VARCHAR(32) NOT NULL,
@@ -1125,6 +1414,7 @@ async fn db_search_url_metadata(
             crawl_timestamp: Some(timestamp),
             warc_filename: filename,
             warc_offset: offset,
+            related_links: Vec::new(),
         });
     }
     Ok(results)
@@ -1261,6 +1551,7 @@ async fn db_search_urls_from_domains(
             crawl_timestamp: Some(timestamp),
             warc_filename: filename,
             warc_offset: offset,
+            related_links: Vec::new(),
         });
     }
     Ok(results)
@@ -1330,17 +1621,21 @@ async fn db_search(
     let rows = db.query(
         r#"
         WITH ranked_pages AS (
-            SELECT d.domain_name, d.category, p.url, p.title, p.description,
+            SELECT p.id AS page_id, d.domain_name, d.category, p.url, p.title, p.description,
                    left(COALESCE(p.content, ''), 4000) AS page_text,
                    p.crawl_timestamp, p.warc_filename, p.warc_offset,
-                   CASE WHEN $3 = '' THEN 0::real ELSE ts_rank(
-                       COALESCE(p.search_vector, to_tsvector('simple', concat_ws(' ', p.title, p.description, p.content))),
+                   CASE WHEN $3 = '' THEN 0::real ELSE ts_rank_cd(
+                       setweight(to_tsvector('simple', COALESCE(p.title, '')), 'A') ||
+                       setweight(to_tsvector('simple', COALESCE(p.description, '')), 'B') ||
+                       setweight(to_tsvector('simple', COALESCE(p.content, '')), 'C'),
                        websearch_to_tsquery('simple', $3)
                    ) END AS relevance,
                    ROW_NUMBER() OVER (
                        PARTITION BY CASE WHEN $1::text IS NULL THEN COALESCE(d.domain_name, p.url) ELSE p.url END
-                       ORDER BY CASE WHEN $3 = '' THEN 0::real ELSE ts_rank(
-                           COALESCE(p.search_vector, to_tsvector('simple', concat_ws(' ', p.title, p.description, p.content))),
+                       ORDER BY CASE WHEN $3 = '' THEN 0::real ELSE ts_rank_cd(
+                           setweight(to_tsvector('simple', COALESCE(p.title, '')), 'A') ||
+                           setweight(to_tsvector('simple', COALESCE(p.description, '')), 'B') ||
+                           setweight(to_tsvector('simple', COALESCE(p.content, '')), 'C'),
                            websearch_to_tsquery('simple', $3)
                        ) END DESC, p.crawl_timestamp DESC NULLS LAST
                    ) AS domain_rank
@@ -1348,9 +1643,13 @@ async fn db_search(
             LEFT JOIN public.domains d ON d.id = p.domain_id
             WHERE ($1::text IS NULL OR lower(d.domain_name) = $1 OR lower(d.domain_name) LIKE '%.' || $1)
               AND ($2::text IS NULL OR lower(d.category) = $2)
-              AND ($3 = '' OR COALESCE(p.search_vector, to_tsvector('simple', concat_ws(' ', p.title, p.description, p.content))) @@ websearch_to_tsquery('simple', $3))
+              AND ($3 = '' OR (
+                   setweight(to_tsvector('simple', COALESCE(p.title, '')), 'A') ||
+                   setweight(to_tsvector('simple', COALESCE(p.description, '')), 'B') ||
+                   setweight(to_tsvector('simple', COALESCE(p.content, '')), 'C')
+              ) @@ websearch_to_tsquery('simple', $3))
         )
-        SELECT domain_name, category, url, title, description, page_text,
+        SELECT page_id, domain_name, category, url, title, description, page_text,
                crawl_timestamp, warc_filename, warc_offset
         FROM ranked_pages
         WHERE domain_rank = 1
@@ -1361,16 +1660,36 @@ async fn db_search(
     ).await.context("database search failed")?;
     let mut pages = Vec::new();
     for row in rows {
-        let domain_name: Option<String> = row.get(0);
-        let category: Option<String> = row.get(1);
-        let url: String = row.get(2);
-        let title: Option<String> = row.get(3);
-        let description: Option<String> = row.get(4);
-        let text: String = row.get(5);
-        let timestamp: Option<String> = row.get(6);
-        let filename: Option<String> = row.get(7);
-        let offset: Option<i64> = row.get(8);
+        let page_id: i64 = row.get(0);
+        let domain_name: Option<String> = row.get(1);
+        let category: Option<String> = row.get(2);
+        let url: String = row.get(3);
+        let title: Option<String> = row.get(4);
+        let description: Option<String> = row.get(5);
+        let text: String = row.get(6);
+        let timestamp: Option<String> = row.get(7);
+        let filename: Option<String> = row.get(8);
+        let offset: Option<i64> = row.get(9);
         let snippet = make_snippet(&text, &keywords.split_whitespace().collect::<Vec<_>>());
+        let link_rows = db.query(
+            "SELECT target_url, anchor_text FROM public.page_links WHERE source_page_id=$1 ORDER BY id DESC LIMIT 200",
+            &[&page_id],
+        ).await.context("could not load related page links")?;
+        let terms: Vec<String> = keywords.split_whitespace()
+            .map(|term| term.trim_matches(|ch: char| !ch.is_alphanumeric()).to_lowercase())
+            .filter(|term| term.len() > 2)
+            .collect();
+        let mut related_links: Vec<RelatedLink> = link_rows.into_iter().filter_map(|link_row| {
+            let target_url: String = link_row.get(0);
+            let anchor_text: Option<String> = link_row.get(1);
+            let searchable = format!("{} {}", target_url, anchor_text.as_deref().unwrap_or("")).to_lowercase();
+            if terms.is_empty() || terms.iter().any(|term| searchable.contains(term)) {
+                Some(RelatedLink { url: target_url, anchor_text })
+            } else {
+                None
+            }
+        }).take(10).collect();
+        related_links.dedup_by(|left, right| left.url == right.url);
         pages.push(Website {
             domain: domain_name.unwrap_or_else(|| host_from_url(&url)),
             category,
@@ -1381,6 +1700,7 @@ async fn db_search(
             crawl_timestamp: timestamp,
             warc_filename: filename,
             warc_offset: offset,
+            related_links,
         });
     }
     pages.truncate(TOP_K as usize);
@@ -1556,11 +1876,25 @@ async fn crawl_domain_records(
     page_budget: usize,
     metadata_only: bool,
 ) -> Result<(usize, usize)> {
-    let records = query_index(&state.http, index_url, domain, state.record_limit).await?;
+    let mut records = query_index(&state.http, index_url, domain, state.record_limit).await?;
     if metadata_only {
         let mut stored = 0usize;
         let mut failed = 0usize;
-        for record in records.iter().take(page_budget) {
+        let mut ranked_records: Vec<(usize, &CdxRecord)> = records
+            .iter()
+            .map(|record| (url_keyword_score(&record.url, _keywords), record))
+            .collect();
+        ranked_records.sort_by(|left, right| {
+            right.0.cmp(&left.0).then_with(|| right.1.timestamp.cmp(&left.1.timestamp))
+        });
+        let has_path_matches = ranked_records.first().is_some_and(|(score, _)| *score > 0);
+        let selected_records: Vec<&CdxRecord> = ranked_records
+            .into_iter()
+            .filter(|(score, _)| !has_path_matches || *score > 0)
+            .take(page_budget)
+            .map(|(_, record)| record)
+            .collect();
+        for record in selected_records {
             match store_url_metadata(&state.db, domain, _sector, crawl_id, record).await {
                 Ok(()) => stored += 1,
                 Err(error) => {
@@ -1571,6 +1905,12 @@ async fn crawl_domain_records(
         }
         return Ok((stored, failed));
     }
+    // Prefer page URLs that match the query before using a recent unrelated page.
+    records.sort_by(|left, right| {
+        url_keyword_score(&right.url, _keywords)
+            .cmp(&url_keyword_score(&left.url, _keywords))
+            .then_with(|| right.timestamp.cmp(&left.timestamp))
+    });
     let mut saved = 0usize;
     let mut failed = 0usize;
     let mut fetched = 0usize;
@@ -1658,6 +1998,14 @@ async fn crawl_domain_records(
     }
     let _ = crawl_id;
     Ok((saved, failed))
+}
+
+fn url_keyword_score(url: &str, keywords: &[String]) -> usize {
+    let Ok(parsed) = Url::parse(url) else { return 0 };
+    let path = format!("{}?{}", parsed.path().to_ascii_lowercase(), parsed.query().unwrap_or(""));
+    keywords.iter()
+        .filter(|word| word.len() > 1 && path.contains(&word.to_ascii_lowercase()))
+        .count()
 }
 
 async fn store_url_metadata(
@@ -1988,14 +2336,54 @@ fn extract_page_metadata(
     let title = text_of("title");
     let description = meta_value("meta[name='description']")
         .or_else(|| meta_value("meta[property='og:description']"));
-    let body_selector = Selector::parse("body").ok();
-    let mut content = body_selector
-        .and_then(|s| document.select(&s).next())
-        .map(|body| body.text().collect::<Vec<_>>().join(" "))
-        .unwrap_or_else(|| document.root_element().text().collect::<Vec<_>>().join(" "))
-        .split_whitespace()
-        .collect::<Vec<_>>()
-        .join(" ");
+    // Keep semantic page content instead of menus, scripts, and footer boilerplate.
+    // Headings are placed first so the existing PostgreSQL full-text rank naturally
+    // gives the page's main subject stronger prominence in its compact snippet.
+    let mut useful_parts = Vec::new();
+    for (selector_text, minimum_chars) in [
+        ("h1", 3),
+        ("h2", 3),
+        ("h3", 3),
+        ("main p", 35),
+        ("article p", 35),
+        ("main li", 35),
+        ("article li", 35),
+    ] {
+        let Ok(selector) = Selector::parse(selector_text) else {
+            continue;
+        };
+        for element in document.select(&selector) {
+            let text = element
+                .text()
+                .collect::<Vec<_>>()
+                .join(" ")
+                .split_whitespace()
+                .collect::<Vec<_>>()
+                .join(" ");
+            if text.chars().count() >= minimum_chars && !useful_parts.contains(&text) {
+                useful_parts.push(text);
+            }
+        }
+    }
+    // Some archived pages don't use <main> or <article>. Fall back to paragraph
+    // text, while still excluding navigation and other non-content elements.
+    if useful_parts.is_empty() {
+        if let Ok(selector) = Selector::parse("p") {
+            for element in document.select(&selector) {
+                let text = element
+                    .text()
+                    .collect::<Vec<_>>()
+                    .join(" ")
+                    .split_whitespace()
+                    .collect::<Vec<_>>()
+                    .join(" ");
+                if text.chars().count() >= 35 && !useful_parts.contains(&text) {
+                    useful_parts.push(text);
+                }
+            }
+        }
+    }
+    let mut content = useful_parts.join("\n");
     if content.chars().count() > MAX_TEXT_CHARS {
         content = content.chars().take(MAX_TEXT_CHARS).collect();
     }

@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "queries": [
+    {
+      "query": "What is Python programming?",
+      "expected_sector_id": "python_programming"
+    },
+    {
+      "query": "How does Java garbage collection work?",
+      "expected_sector_id": "java_programming"
+    },
+    {
+      "query": "Explain C++ pointers",
+      "expected_sector_id": "c_and_c_programming"
+    },
+    {
+      "query": "What is JavaScript used for?",
+      "expected_sector_id": "javascript_and_typescript"
+    },
+    {
+      "query": "What is Rust ownership?",
+      "expected_sector_id": "rust_and_go_programming"
+    },
+    {
+      "query": "How do I build a website?",
+      "expected_sector_id": "web_development"
+    },
+    {
+      "query": "How to create an Android app?",
+      "expected_sector_id": "mobile_app_development"
+    },
+    {
+      "query": "What is a SQL join?",
+      "expected_sector_id": "databases_and_sql"
+    },
+    {
+      "query": "Explain microservices architecture",
+      "expected_sector_id": "software_architecture"
+    },
+    {
+      "query": "How do sorting algorithms work?",
+      "expected_sector_id": "algorithms_and_data_structures"
+    },
+    {
+      "query": "What is machine learning?",
+      "expected_sector_id": "machine_learning"
+    },
+    {
+      "query": "Explain neural networks",
+      "expected_sector_id": "deep_learning"
+    },
+    {
+      "query": "What is a large language model?",
+      "expected_sector_id": "generative_ai_and_llms"
+    },
+    {
+      "query": "How does image recognition work?",
+      "expected_sector_id": "computer_vision"
+    },
+    {
+      "query": "What is data science?",
+      "expected_sector_id": "data_science"
+    },
+    {
+      "query": "How do search engines rank pages?",
+      "expected_sector_id": "information_retrieval_and_search"
+    },
+    {
+      "query": "What are heart attack symptoms?",
+      "expected_sector_id": "cardiology"
+    },
+    {
+      "query": "How to manage anxiety?",
+      "expected_sector_id": "mental_health"
+    },
+    {
+      "query": "What is a balanced diet?",
+      "expected_sector_id": "nutrition_and_dietetics"
+    },
+    {
+      "query": "How do vaccines work?",
+      "expected_sector_id": "pharmacology"
+    },
+    {
+      "query": "What is childhood asthma?",
+      "expected_sector_id": "pediatrics"
+    },
+    {
+      "query": "What is climate change?",
+      "expected_sector_id": "climate_science"
+    },
+    {
+      "query": "How do solar panels generate electricity?",
+      "expected_sector_id": "renewable_energy"
+    },
+    {
+      "query": "What is DNA sequencing?",
+      "expected_sector_id": "genetics_and_genomics"
+    },
+    {
+      "query": "Explain black holes",
+      "expected_sector_id": "astronomy_and_space_science"
+    },
+    {
+      "query": "How does a lithium battery work?",
+      "expected_sector_id": "materials_science"
+    },
+    {
+      "query": "What is structural engineering?",
+      "expected_sector_id": "structural_engineering"
+    },
+    {
+      "query": "How does online learning work?",
+      "expected_sector_id": "online_learning"
+    },
+    {
+      "query": "How do I make a business plan?",
+      "expected_sector_id": "entrepreneurship"
+    },
+    {
+      "query": "How does compound interest work?",
+      "expected_sector_id": "personal_finance"
+    },
+    {
+      "query": "What is copyright law?",
+      "expected_sector_id": "intellectual_property_law"
+    },
+    {
+      "query": "How can we reduce plastic waste?",
+      "expected_sector_id": "waste_management"
+    },
+    {
+      "query": "How do farmers improve soil health?",
+      "expected_sector_id": "soil_science"
+    },
+    {
+      "query": "What is graphic design?",
+      "expected_sector_id": "graphic_design"
+    },
+    {
+      "query": "What did ancient Rome contribute?",
+      "expected_sector_id": "history"
+    },
+    {
+      "query": "How does social media affect society?",
+      "expected_sector_id": "sociology"
+    },
+    {
+      "query": "How do journalists verify sources?",
+      "expected_sector_id": "journalism"
+    },
+    {
+      "query": "What is sports psychology?",
+      "expected_sector_id": "sports_psychology"
+    },
+    {
+      "query": "Are electric vehicles better for cities?",
+      "expected_sector_id": "electric_vehicles"
+    },
+    {
+      "query": "How do I plan a trip to Japan?",
+      "expected_sector_id": "travel_and_tourism"
+    }
+  ]
+}

@@ -1,5 +1,8 @@
 from typing import Optional
 from pydantic import BaseModel, Field, field_validator
+from app.services.query_understanding import SECTOR_CATALOG
+
+SECTOR_IDS = {sector["id"] for sector in SECTOR_CATALOG}
 
 
 class QueryRequest(BaseModel):
@@ -26,6 +29,6 @@ class QueryRequest(BaseModel):
         if value is None or not value.strip():
             return None
         value = value.strip().lower()
-        if value not in {"technology", "health", "general"}:
-            raise ValueError("sector must be technology, health, or general")
+        if value not in {"technology", "health", "general"} and value not in SECTOR_IDS:
+            raise ValueError("sector must be technology, health, general, or a sector id from sectors.json")
         return value

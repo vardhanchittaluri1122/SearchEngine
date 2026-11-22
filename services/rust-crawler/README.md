@@ -4,7 +4,7 @@ Go routes each request to a Rust process that is connected to one sector databas
 
 ## Search behavior
 
-`POST /api/v1/search` checks existing stored pages, then registered domains and the candidates supplied by Go. For each candidate, Rust asks the selected Common Crawl CDX URL index for recent successful HTML capture metadata. It stores URLs, capture timestamps, MIME/status, digest, and WARC filename/offset/length in `common_crawl_urls`. Normal Go requests set `metadata_only=true`, so the search path does not retrieve WARC page bodies.
+`POST /api/v1/search` checks stored pages and supplied candidate domains. Go returns candidate URLs from the Parquet URL index immediately, then Rust checks Common Crawl CDX in a background job. The job fetches matching WARC captures, extracts page text and outgoing links, and stores them in the selected sector database. Later searches can return the stored page URLs and matching related links.
 
 On startup, Rust creates `common_crawl_urls` and indexes if they do not exist. Existing `domains`, `web_pages`, `crawl_sources`, and `crawl_jobs` tables are still required for registered-domain handling and explicit extraction.
 

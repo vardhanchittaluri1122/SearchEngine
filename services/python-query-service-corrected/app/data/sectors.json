@@ -1,0 +1,1607 @@
+{
+  "version": 1,
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "sector_count": 200,
+  "sectors": [
+    {
+      "id": "python_programming",
+      "name": "Python programming",
+      "family_id": "programming_software",
+      "family": "Programming and Software",
+      "description": "Python programming. Programming and Software subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_python_programming"
+    },
+    {
+      "id": "java_programming",
+      "name": "Java programming",
+      "family_id": "programming_software",
+      "family": "Programming and Software",
+      "description": "Java programming. Programming and Software subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_java_programming"
+    },
+    {
+      "id": "c_and_c_programming",
+      "name": "C and C++ programming",
+      "family_id": "programming_software",
+      "family": "Programming and Software",
+      "description": "C and C++ programming. Programming and Software subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_c_and_c_programming"
+    },
+    {
+      "id": "javascript_and_typescript",
+      "name": "JavaScript and TypeScript",
+      "family_id": "programming_software",
+      "family": "Programming and Software",
+      "description": "JavaScript and TypeScript. Programming and Software subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_javascript_and_typescript"
+    },
+    {
+      "id": "rust_and_go_programming",
+      "name": "Rust and Go programming",
+      "family_id": "programming_software",
+      "family": "Programming and Software",
+      "description": "Rust and Go programming. Programming and Software subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_rust_and_go_programming"
+    },
+    {
+      "id": "web_development",
+      "name": "Web development",
+      "family_id": "programming_software",
+      "family": "Programming and Software",
+      "description": "Web development. Programming and Software subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_web_development"
+    },
+    {
+      "id": "mobile_app_development",
+      "name": "Mobile app development",
+      "family_id": "programming_software",
+      "family": "Programming and Software",
+      "description": "Mobile app development. Programming and Software subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_mobile_app_development"
+    },
+    {
+      "id": "databases_and_sql",
+      "name": "Databases and SQL",
+      "family_id": "programming_software",
+      "family": "Programming and Software",
+      "description": "Databases and SQL. Programming and Software subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_databases_and_sql"
+    },
+    {
+      "id": "software_architecture",
+      "name": "Software architecture",
+      "family_id": "programming_software",
+      "family": "Programming and Software",
+      "description": "Software architecture. Programming and Software subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_software_architecture"
+    },
+    {
+      "id": "algorithms_and_data_structures",
+      "name": "Algorithms and data structures",
+      "family_id": "programming_software",
+      "family": "Programming and Software",
+      "description": "Algorithms and data structures. Programming and Software subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_algorithms_and_data_structures"
+    },
+    {
+      "id": "artificial_intelligence",
+      "name": "Artificial intelligence",
+      "family_id": "ai_data",
+      "family": "AI and Data",
+      "description": "Artificial intelligence. AI and Data subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_artificial_intelligence"
+    },
+    {
+      "id": "machine_learning",
+      "name": "Machine learning",
+      "family_id": "ai_data",
+      "family": "AI and Data",
+      "description": "Machine learning. AI and Data subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_machine_learning"
+    },
+    {
+      "id": "deep_learning",
+      "name": "Deep learning",
+      "family_id": "ai_data",
+      "family": "AI and Data",
+      "description": "Deep learning. AI and Data subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_deep_learning"
+    },
+    {
+      "id": "natural_language_processing",
+      "name": "Natural language processing",
+      "family_id": "ai_data",
+      "family": "AI and Data",
+      "description": "Natural language processing. AI and Data subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_natural_language_processing"
+    },
+    {
+      "id": "computer_vision",
+      "name": "Computer vision",
+      "family_id": "ai_data",
+      "family": "AI and Data",
+      "description": "Computer vision. AI and Data subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_computer_vision"
+    },
+    {
+      "id": "generative_ai_and_llms",
+      "name": "Generative AI and LLMs",
+      "family_id": "ai_data",
+      "family": "AI and Data",
+      "description": "Generative AI and LLMs. AI and Data subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_generative_ai_and_llms"
+    },
+    {
+      "id": "data_science",
+      "name": "Data science",
+      "family_id": "ai_data",
+      "family": "AI and Data",
+      "description": "Data science. AI and Data subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_data_science"
+    },
+    {
+      "id": "data_engineering",
+      "name": "Data engineering",
+      "family_id": "ai_data",
+      "family": "AI and Data",
+      "description": "Data engineering. AI and Data subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_data_engineering"
+    },
+    {
+      "id": "data_analytics",
+      "name": "Data analytics",
+      "family_id": "ai_data",
+      "family": "AI and Data",
+      "description": "Data analytics. AI and Data subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_data_analytics"
+    },
+    {
+      "id": "information_retrieval_and_search",
+      "name": "Information retrieval and search",
+      "family_id": "ai_data",
+      "family": "AI and Data",
+      "description": "Information retrieval and search. AI and Data subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_information_retrieval_and_search"
+    },
+    {
+      "id": "cardiology",
+      "name": "Cardiology",
+      "family_id": "health_medicine",
+      "family": "Health and Medicine",
+      "description": "Cardiology. Health and Medicine subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_cardiology"
+    },
+    {
+      "id": "neurology",
+      "name": "Neurology",
+      "family_id": "health_medicine",
+      "family": "Health and Medicine",
+      "description": "Neurology. Health and Medicine subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_neurology"
+    },
+    {
+      "id": "oncology",
+      "name": "Oncology",
+      "family_id": "health_medicine",
+      "family": "Health and Medicine",
+      "description": "Oncology. Health and Medicine subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_oncology"
+    },
+    {
+      "id": "primary_care",
+      "name": "Primary care",
+      "family_id": "health_medicine",
+      "family": "Health and Medicine",
+      "description": "Primary care. Health and Medicine subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_primary_care"
+    },
+    {
+      "id": "mental_health",
+      "name": "Mental health",
+      "family_id": "health_medicine",
+      "family": "Health and Medicine",
+      "description": "Mental health. Health and Medicine subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_mental_health"
+    },
+    {
+      "id": "public_health",
+      "name": "Public health",
+      "family_id": "health_medicine",
+      "family": "Health and Medicine",
+      "description": "Public health. Health and Medicine subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_public_health"
+    },
+    {
+      "id": "nutrition_and_dietetics",
+      "name": "Nutrition and dietetics",
+      "family_id": "health_medicine",
+      "family": "Health and Medicine",
+      "description": "Nutrition and dietetics. Health and Medicine subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_nutrition_and_dietetics"
+    },
+    {
+      "id": "pharmacology",
+      "name": "Pharmacology",
+      "family_id": "health_medicine",
+      "family": "Health and Medicine",
+      "description": "Pharmacology. Health and Medicine subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_pharmacology"
+    },
+    {
+      "id": "pediatrics",
+      "name": "Pediatrics",
+      "family_id": "health_medicine",
+      "family": "Health and Medicine",
+      "description": "Pediatrics. Health and Medicine subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_pediatrics"
+    },
+    {
+      "id": "women_s_health",
+      "name": "Women’s health",
+      "family_id": "health_medicine",
+      "family": "Health and Medicine",
+      "description": "Women’s health. Health and Medicine subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_women_s_health"
+    },
+    {
+      "id": "molecular_biology",
+      "name": "Molecular biology",
+      "family_id": "biology",
+      "family": "Biological Sciences",
+      "description": "Molecular biology. Biological Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_molecular_biology"
+    },
+    {
+      "id": "genetics_and_genomics",
+      "name": "Genetics and genomics",
+      "family_id": "biology",
+      "family": "Biological Sciences",
+      "description": "Genetics and genomics. Biological Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_genetics_and_genomics"
+    },
+    {
+      "id": "microbiology",
+      "name": "Microbiology",
+      "family_id": "biology",
+      "family": "Biological Sciences",
+      "description": "Microbiology. Biological Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_microbiology"
+    },
+    {
+      "id": "immunology",
+      "name": "Immunology",
+      "family_id": "biology",
+      "family": "Biological Sciences",
+      "description": "Immunology. Biological Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_immunology"
+    },
+    {
+      "id": "ecology",
+      "name": "Ecology",
+      "family_id": "biology",
+      "family": "Biological Sciences",
+      "description": "Ecology. Biological Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_ecology"
+    },
+    {
+      "id": "evolutionary_biology",
+      "name": "Evolutionary biology",
+      "family_id": "biology",
+      "family": "Biological Sciences",
+      "description": "Evolutionary biology. Biological Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_evolutionary_biology"
+    },
+    {
+      "id": "neuroscience",
+      "name": "Neuroscience",
+      "family_id": "biology",
+      "family": "Biological Sciences",
+      "description": "Neuroscience. Biological Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_neuroscience"
+    },
+    {
+      "id": "biochemistry",
+      "name": "Biochemistry",
+      "family_id": "biology",
+      "family": "Biological Sciences",
+      "description": "Biochemistry. Biological Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_biochemistry"
+    },
+    {
+      "id": "botany",
+      "name": "Botany",
+      "family_id": "biology",
+      "family": "Biological Sciences",
+      "description": "Botany. Biological Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_botany"
+    },
+    {
+      "id": "zoology",
+      "name": "Zoology",
+      "family_id": "biology",
+      "family": "Biological Sciences",
+      "description": "Zoology. Biological Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_zoology"
+    },
+    {
+      "id": "physics",
+      "name": "Physics",
+      "family_id": "physical_sciences",
+      "family": "Physical Sciences",
+      "description": "Physics. Physical Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_physics"
+    },
+    {
+      "id": "chemistry",
+      "name": "Chemistry",
+      "family_id": "physical_sciences",
+      "family": "Physical Sciences",
+      "description": "Chemistry. Physical Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_chemistry"
+    },
+    {
+      "id": "astronomy_and_space_science",
+      "name": "Astronomy and space science",
+      "family_id": "physical_sciences",
+      "family": "Physical Sciences",
+      "description": "Astronomy and space science. Physical Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_astronomy_and_space_science"
+    },
+    {
+      "id": "geology",
+      "name": "Geology",
+      "family_id": "physical_sciences",
+      "family": "Physical Sciences",
+      "description": "Geology. Physical Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_geology"
+    },
+    {
+      "id": "climate_science",
+      "name": "Climate science",
+      "family_id": "physical_sciences",
+      "family": "Physical Sciences",
+      "description": "Climate science. Physical Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_climate_science"
+    },
+    {
+      "id": "oceanography",
+      "name": "Oceanography",
+      "family_id": "physical_sciences",
+      "family": "Physical Sciences",
+      "description": "Oceanography. Physical Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_oceanography"
+    },
+    {
+      "id": "materials_science",
+      "name": "Materials science",
+      "family_id": "physical_sciences",
+      "family": "Physical Sciences",
+      "description": "Materials science. Physical Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_materials_science"
+    },
+    {
+      "id": "applied_mathematics",
+      "name": "Applied mathematics",
+      "family_id": "physical_sciences",
+      "family": "Physical Sciences",
+      "description": "Applied mathematics: mathematical modeling, statistics, calculus, algebra, numerical methods, optimization, equations and mathematical problem solving.",
+      "database_name": "searchengine_applied_mathematics"
+    },
+    {
+      "id": "statistics",
+      "name": "Statistics",
+      "family_id": "physical_sciences",
+      "family": "Physical Sciences",
+      "description": "Statistics. Physical Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_statistics"
+    },
+    {
+      "id": "scientific_instrumentation",
+      "name": "Scientific instrumentation",
+      "family_id": "physical_sciences",
+      "family": "Physical Sciences",
+      "description": "Scientific instrumentation. Physical Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_scientific_instrumentation"
+    },
+    {
+      "id": "mechanical_engineering",
+      "name": "Mechanical engineering",
+      "family_id": "engineering",
+      "family": "Engineering",
+      "description": "Mechanical engineering. Engineering subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_mechanical_engineering"
+    },
+    {
+      "id": "electrical_engineering",
+      "name": "Electrical engineering",
+      "family_id": "engineering",
+      "family": "Engineering",
+      "description": "Electrical engineering. Engineering subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_electrical_engineering"
+    },
+    {
+      "id": "civil_engineering",
+      "name": "Civil engineering",
+      "family_id": "engineering",
+      "family": "Engineering",
+      "description": "Civil engineering. Engineering subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_civil_engineering"
+    },
+    {
+      "id": "chemical_engineering",
+      "name": "Chemical engineering",
+      "family_id": "engineering",
+      "family": "Engineering",
+      "description": "Chemical engineering. Engineering subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_chemical_engineering"
+    },
+    {
+      "id": "aerospace_engineering",
+      "name": "Aerospace engineering",
+      "family_id": "engineering",
+      "family": "Engineering",
+      "description": "Aerospace engineering. Engineering subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_aerospace_engineering"
+    },
+    {
+      "id": "biomedical_engineering",
+      "name": "Biomedical engineering",
+      "family_id": "engineering",
+      "family": "Engineering",
+      "description": "Biomedical engineering. Engineering subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_biomedical_engineering"
+    },
+    {
+      "id": "robotics",
+      "name": "Robotics",
+      "family_id": "engineering",
+      "family": "Engineering",
+      "description": "Robotics. Engineering subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_robotics"
+    },
+    {
+      "id": "control_systems",
+      "name": "Control systems",
+      "family_id": "engineering",
+      "family": "Engineering",
+      "description": "Control systems. Engineering subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_control_systems"
+    },
+    {
+      "id": "manufacturing_engineering",
+      "name": "Manufacturing engineering",
+      "family_id": "engineering",
+      "family": "Engineering",
+      "description": "Manufacturing engineering. Engineering subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_manufacturing_engineering"
+    },
+    {
+      "id": "structural_engineering",
+      "name": "Structural engineering",
+      "family_id": "engineering",
+      "family": "Engineering",
+      "description": "Structural engineering. Engineering subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_structural_engineering"
+    },
+    {
+      "id": "early_childhood_education",
+      "name": "Early childhood education",
+      "family_id": "education",
+      "family": "Education",
+      "description": "Early childhood education. Education subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_early_childhood_education"
+    },
+    {
+      "id": "primary_education",
+      "name": "Primary education",
+      "family_id": "education",
+      "family": "Education",
+      "description": "Primary education. Education subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_primary_education"
+    },
+    {
+      "id": "secondary_education",
+      "name": "Secondary education",
+      "family_id": "education",
+      "family": "Education",
+      "description": "Secondary education. Education subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_secondary_education"
+    },
+    {
+      "id": "higher_education",
+      "name": "Higher education",
+      "family_id": "education",
+      "family": "Education",
+      "description": "Higher education: universities, colleges, academic programs, scholarly research, university admissions, degrees, professors and student learning.",
+      "database_name": "searchengine_higher_education"
+    },
+    {
+      "id": "online_learning",
+      "name": "Online learning",
+      "family_id": "education",
+      "family": "Education",
+      "description": "Online learning. Education subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_online_learning"
+    },
+    {
+      "id": "special_education",
+      "name": "Special education",
+      "family_id": "education",
+      "family": "Education",
+      "description": "Special education. Education subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_special_education"
+    },
+    {
+      "id": "education_policy",
+      "name": "Education policy",
+      "family_id": "education",
+      "family": "Education",
+      "description": "Education policy. Education subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_education_policy"
+    },
+    {
+      "id": "assessment_and_testing",
+      "name": "Assessment and testing",
+      "family_id": "education",
+      "family": "Education",
+      "description": "Assessment and testing. Education subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_assessment_and_testing"
+    },
+    {
+      "id": "educational_technology",
+      "name": "Educational technology",
+      "family_id": "education",
+      "family": "Education",
+      "description": "Educational technology. Education subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_educational_technology"
+    },
+    {
+      "id": "vocational_training",
+      "name": "Vocational training",
+      "family_id": "education",
+      "family": "Education",
+      "description": "Vocational training. Education subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_vocational_training"
+    },
+    {
+      "id": "entrepreneurship",
+      "name": "Entrepreneurship",
+      "family_id": "business",
+      "family": "Business and Management",
+      "description": "Entrepreneurship. Business and Management subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_entrepreneurship"
+    },
+    {
+      "id": "business_strategy",
+      "name": "Business strategy",
+      "family_id": "business",
+      "family": "Business and Management",
+      "description": "Business strategy. Business and Management subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_business_strategy"
+    },
+    {
+      "id": "marketing",
+      "name": "Marketing",
+      "family_id": "business",
+      "family": "Business and Management",
+      "description": "Marketing. Business and Management subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_marketing"
+    },
+    {
+      "id": "sales",
+      "name": "Sales",
+      "family_id": "business",
+      "family": "Business and Management",
+      "description": "Sales. Business and Management subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_sales"
+    },
+    {
+      "id": "operations_management",
+      "name": "Operations management",
+      "family_id": "business",
+      "family": "Business and Management",
+      "description": "Operations management. Business and Management subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_operations_management"
+    },
+    {
+      "id": "human_resources",
+      "name": "Human resources",
+      "family_id": "business",
+      "family": "Business and Management",
+      "description": "Human resources. Business and Management subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_human_resources"
+    },
+    {
+      "id": "project_management",
+      "name": "Project management",
+      "family_id": "business",
+      "family": "Business and Management",
+      "description": "Project management. Business and Management subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_project_management"
+    },
+    {
+      "id": "supply_chain_management",
+      "name": "Supply chain management",
+      "family_id": "business",
+      "family": "Business and Management",
+      "description": "Supply chain management. Business and Management subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_supply_chain_management"
+    },
+    {
+      "id": "accounting",
+      "name": "Accounting",
+      "family_id": "business",
+      "family": "Business and Management",
+      "description": "Accounting. Business and Management subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_accounting"
+    },
+    {
+      "id": "business_analytics",
+      "name": "Business analytics",
+      "family_id": "business",
+      "family": "Business and Management",
+      "description": "Business analytics. Business and Management subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_business_analytics"
+    },
+    {
+      "id": "personal_finance",
+      "name": "Personal finance",
+      "family_id": "finance",
+      "family": "Finance and Economics",
+      "description": "Personal finance. Finance and Economics subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_personal_finance"
+    },
+    {
+      "id": "banking",
+      "name": "Banking",
+      "family_id": "finance",
+      "family": "Finance and Economics",
+      "description": "Banking. Finance and Economics subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_banking"
+    },
+    {
+      "id": "investing",
+      "name": "Investing",
+      "family_id": "finance",
+      "family": "Finance and Economics",
+      "description": "Investing. Finance and Economics subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_investing"
+    },
+    {
+      "id": "financial_markets",
+      "name": "Financial markets",
+      "family_id": "finance",
+      "family": "Finance and Economics",
+      "description": "Financial markets. Finance and Economics subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_financial_markets"
+    },
+    {
+      "id": "insurance",
+      "name": "Insurance",
+      "family_id": "finance",
+      "family": "Finance and Economics",
+      "description": "Insurance. Finance and Economics subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_insurance"
+    },
+    {
+      "id": "macroeconomics",
+      "name": "Macroeconomics",
+      "family_id": "finance",
+      "family": "Finance and Economics",
+      "description": "Macroeconomics. Finance and Economics subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_macroeconomics"
+    },
+    {
+      "id": "microeconomics",
+      "name": "Microeconomics",
+      "family_id": "finance",
+      "family": "Finance and Economics",
+      "description": "Microeconomics. Finance and Economics subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_microeconomics"
+    },
+    {
+      "id": "international_trade",
+      "name": "International trade",
+      "family_id": "finance",
+      "family": "Finance and Economics",
+      "description": "International trade. Finance and Economics subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_international_trade"
+    },
+    {
+      "id": "cryptocurrency_and_blockchain",
+      "name": "Cryptocurrency and blockchain",
+      "family_id": "finance",
+      "family": "Finance and Economics",
+      "description": "Cryptocurrency and blockchain. Finance and Economics subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_cryptocurrency_and_blockchain"
+    },
+    {
+      "id": "taxation",
+      "name": "Taxation",
+      "family_id": "finance",
+      "family": "Finance and Economics",
+      "description": "Taxation. Finance and Economics subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_taxation"
+    },
+    {
+      "id": "constitutional_law",
+      "name": "Constitutional law",
+      "family_id": "law_government",
+      "family": "Law and Government",
+      "description": "Constitutional law. Law and Government subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_constitutional_law"
+    },
+    {
+      "id": "criminal_law",
+      "name": "Criminal law",
+      "family_id": "law_government",
+      "family": "Law and Government",
+      "description": "Criminal law. Law and Government subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_criminal_law"
+    },
+    {
+      "id": "civil_law",
+      "name": "Civil law",
+      "family_id": "law_government",
+      "family": "Law and Government",
+      "description": "Civil law. Law and Government subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_civil_law"
+    },
+    {
+      "id": "intellectual_property_law",
+      "name": "Intellectual property law",
+      "family_id": "law_government",
+      "family": "Law and Government",
+      "description": "Intellectual property law. Law and Government subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_intellectual_property_law"
+    },
+    {
+      "id": "international_law",
+      "name": "International law",
+      "family_id": "law_government",
+      "family": "Law and Government",
+      "description": "International law. Law and Government subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_international_law"
+    },
+    {
+      "id": "human_rights",
+      "name": "Human rights",
+      "family_id": "law_government",
+      "family": "Law and Government",
+      "description": "Human rights. Law and Government subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_human_rights"
+    },
+    {
+      "id": "public_administration",
+      "name": "Public administration",
+      "family_id": "law_government",
+      "family": "Law and Government",
+      "description": "Public administration. Law and Government subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_public_administration"
+    },
+    {
+      "id": "elections_and_democracy",
+      "name": "Elections and democracy",
+      "family_id": "law_government",
+      "family": "Law and Government",
+      "description": "Elections and democracy. Law and Government subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_elections_and_democracy"
+    },
+    {
+      "id": "cyber_law",
+      "name": "Cyber law",
+      "family_id": "law_government",
+      "family": "Law and Government",
+      "description": "Cyber law. Law and Government subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_cyber_law"
+    },
+    {
+      "id": "regulation_and_compliance",
+      "name": "Regulation and compliance",
+      "family_id": "law_government",
+      "family": "Law and Government",
+      "description": "Regulation and compliance. Law and Government subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_regulation_and_compliance"
+    },
+    {
+      "id": "renewable_energy",
+      "name": "Renewable energy",
+      "family_id": "environment",
+      "family": "Environment and Sustainability",
+      "description": "Renewable energy. Environment and Sustainability subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_renewable_energy"
+    },
+    {
+      "id": "biodiversity_conservation",
+      "name": "Biodiversity conservation",
+      "family_id": "environment",
+      "family": "Environment and Sustainability",
+      "description": "Biodiversity conservation. Environment and Sustainability subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_biodiversity_conservation"
+    },
+    {
+      "id": "environmental_policy",
+      "name": "Environmental policy",
+      "family_id": "environment",
+      "family": "Environment and Sustainability",
+      "description": "Environmental policy. Environment and Sustainability subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_environmental_policy"
+    },
+    {
+      "id": "waste_management",
+      "name": "Waste management",
+      "family_id": "environment",
+      "family": "Environment and Sustainability",
+      "description": "Waste management. Environment and Sustainability subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_waste_management"
+    },
+    {
+      "id": "water_resources",
+      "name": "Water resources",
+      "family_id": "environment",
+      "family": "Environment and Sustainability",
+      "description": "Water resources. Environment and Sustainability subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_water_resources"
+    },
+    {
+      "id": "sustainable_agriculture",
+      "name": "Sustainable agriculture",
+      "family_id": "environment",
+      "family": "Environment and Sustainability",
+      "description": "Sustainable agriculture. Environment and Sustainability subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_sustainable_agriculture"
+    },
+    {
+      "id": "air_quality",
+      "name": "Air quality",
+      "family_id": "environment",
+      "family": "Environment and Sustainability",
+      "description": "Air quality. Environment and Sustainability subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_air_quality"
+    },
+    {
+      "id": "environmental_engineering",
+      "name": "Environmental engineering",
+      "family_id": "environment",
+      "family": "Environment and Sustainability",
+      "description": "Environmental engineering. Environment and Sustainability subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_environmental_engineering"
+    },
+    {
+      "id": "circular_economy",
+      "name": "Circular economy",
+      "family_id": "environment",
+      "family": "Environment and Sustainability",
+      "description": "Circular economy. Environment and Sustainability subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_circular_economy"
+    },
+    {
+      "id": "environmental_impact_assessment",
+      "name": "Environmental impact assessment",
+      "family_id": "environment",
+      "family": "Environment and Sustainability",
+      "description": "Environmental impact assessment. Environment and Sustainability subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_environmental_impact_assessment"
+    },
+    {
+      "id": "crop_science",
+      "name": "Crop science",
+      "family_id": "agriculture",
+      "family": "Agriculture and Food Systems",
+      "description": "Crop science. Agriculture and Food Systems subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_crop_science"
+    },
+    {
+      "id": "animal_husbandry",
+      "name": "Animal husbandry",
+      "family_id": "agriculture",
+      "family": "Agriculture and Food Systems",
+      "description": "Animal husbandry. Agriculture and Food Systems subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_animal_husbandry"
+    },
+    {
+      "id": "soil_science",
+      "name": "Soil science",
+      "family_id": "agriculture",
+      "family": "Agriculture and Food Systems",
+      "description": "Soil science. Agriculture and Food Systems subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_soil_science"
+    },
+    {
+      "id": "agricultural_technology",
+      "name": "Agricultural technology",
+      "family_id": "agriculture",
+      "family": "Agriculture and Food Systems",
+      "description": "Agricultural technology. Agriculture and Food Systems subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_agricultural_technology"
+    },
+    {
+      "id": "forestry",
+      "name": "Forestry",
+      "family_id": "agriculture",
+      "family": "Agriculture and Food Systems",
+      "description": "Forestry. Agriculture and Food Systems subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_forestry"
+    },
+    {
+      "id": "fisheries_and_aquaculture",
+      "name": "Fisheries and aquaculture",
+      "family_id": "agriculture",
+      "family": "Agriculture and Food Systems",
+      "description": "Fisheries and aquaculture. Agriculture and Food Systems subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_fisheries_and_aquaculture"
+    },
+    {
+      "id": "food_safety",
+      "name": "Food safety",
+      "family_id": "agriculture",
+      "family": "Agriculture and Food Systems",
+      "description": "Food safety. Agriculture and Food Systems subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_food_safety"
+    },
+    {
+      "id": "food_processing",
+      "name": "Food processing",
+      "family_id": "agriculture",
+      "family": "Agriculture and Food Systems",
+      "description": "Food processing. Agriculture and Food Systems subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_food_processing"
+    },
+    {
+      "id": "horticulture",
+      "name": "Horticulture",
+      "family_id": "agriculture",
+      "family": "Agriculture and Food Systems",
+      "description": "Horticulture. Agriculture and Food Systems subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_horticulture"
+    },
+    {
+      "id": "agricultural_economics",
+      "name": "Agricultural economics",
+      "family_id": "agriculture",
+      "family": "Agriculture and Food Systems",
+      "description": "Agricultural economics. Agriculture and Food Systems subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_agricultural_economics"
+    },
+    {
+      "id": "visual_arts",
+      "name": "Visual arts",
+      "family_id": "arts_design",
+      "family": "Arts and Design",
+      "description": "Visual arts. Arts and Design subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_visual_arts"
+    },
+    {
+      "id": "graphic_design",
+      "name": "Graphic design",
+      "family_id": "arts_design",
+      "family": "Arts and Design",
+      "description": "Graphic design. Arts and Design subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_graphic_design"
+    },
+    {
+      "id": "product_design",
+      "name": "Product design",
+      "family_id": "arts_design",
+      "family": "Arts and Design",
+      "description": "Product design. Arts and Design subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_product_design"
+    },
+    {
+      "id": "architecture_and_urban_design",
+      "name": "Architecture and urban design",
+      "family_id": "arts_design",
+      "family": "Arts and Design",
+      "description": "Architecture and urban design. Arts and Design subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_architecture_and_urban_design"
+    },
+    {
+      "id": "photography",
+      "name": "Photography",
+      "family_id": "arts_design",
+      "family": "Arts and Design",
+      "description": "Photography. Arts and Design subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_photography"
+    },
+    {
+      "id": "film_and_cinema",
+      "name": "Film and cinema",
+      "family_id": "arts_design",
+      "family": "Arts and Design",
+      "description": "Film and cinema. Arts and Design subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_film_and_cinema"
+    },
+    {
+      "id": "music",
+      "name": "Music",
+      "family_id": "arts_design",
+      "family": "Arts and Design",
+      "description": "Music. Arts and Design subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_music"
+    },
+    {
+      "id": "theatre_and_performance",
+      "name": "Theatre and performance",
+      "family_id": "arts_design",
+      "family": "Arts and Design",
+      "description": "Theatre and performance. Arts and Design subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_theatre_and_performance"
+    },
+    {
+      "id": "fashion_design",
+      "name": "Fashion design",
+      "family_id": "arts_design",
+      "family": "Arts and Design",
+      "description": "Fashion design. Arts and Design subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_fashion_design"
+    },
+    {
+      "id": "crafts_and_material_culture",
+      "name": "Crafts and material culture",
+      "family_id": "arts_design",
+      "family": "Arts and Design",
+      "description": "Crafts and material culture. Arts and Design subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_crafts_and_material_culture"
+    },
+    {
+      "id": "history",
+      "name": "History",
+      "family_id": "humanities",
+      "family": "Humanities and Culture",
+      "description": "History. Humanities and Culture subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_history"
+    },
+    {
+      "id": "philosophy",
+      "name": "Philosophy",
+      "family_id": "humanities",
+      "family": "Humanities and Culture",
+      "description": "Philosophy. Humanities and Culture subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_philosophy"
+    },
+    {
+      "id": "linguistics",
+      "name": "Linguistics",
+      "family_id": "humanities",
+      "family": "Humanities and Culture",
+      "description": "Linguistics. Humanities and Culture subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_linguistics"
+    },
+    {
+      "id": "literature",
+      "name": "Literature",
+      "family_id": "humanities",
+      "family": "Humanities and Culture",
+      "description": "Literature. Humanities and Culture subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_literature"
+    },
+    {
+      "id": "religious_studies",
+      "name": "Religious studies",
+      "family_id": "humanities",
+      "family": "Humanities and Culture",
+      "description": "Religious studies. Humanities and Culture subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_religious_studies"
+    },
+    {
+      "id": "archaeology",
+      "name": "Archaeology",
+      "family_id": "humanities",
+      "family": "Humanities and Culture",
+      "description": "Archaeology. Humanities and Culture subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_archaeology"
+    },
+    {
+      "id": "cultural_studies",
+      "name": "Cultural studies",
+      "family_id": "humanities",
+      "family": "Humanities and Culture",
+      "description": "Cultural studies. Humanities and Culture subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_cultural_studies"
+    },
+    {
+      "id": "ethics",
+      "name": "Ethics",
+      "family_id": "humanities",
+      "family": "Humanities and Culture",
+      "description": "Ethics. Humanities and Culture subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_ethics"
+    },
+    {
+      "id": "classical_studies",
+      "name": "Classical studies",
+      "family_id": "humanities",
+      "family": "Humanities and Culture",
+      "description": "Classical studies. Humanities and Culture subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_classical_studies"
+    },
+    {
+      "id": "museum_and_heritage_studies",
+      "name": "Museum and heritage studies",
+      "family_id": "humanities",
+      "family": "Humanities and Culture",
+      "description": "Museum and heritage studies. Humanities and Culture subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_museum_and_heritage_studies"
+    },
+    {
+      "id": "sociology",
+      "name": "Sociology",
+      "family_id": "social_sciences",
+      "family": "Social Sciences",
+      "description": "Sociology. Social Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_sociology"
+    },
+    {
+      "id": "psychology",
+      "name": "Psychology",
+      "family_id": "social_sciences",
+      "family": "Social Sciences",
+      "description": "Psychology. Social Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_psychology"
+    },
+    {
+      "id": "anthropology",
+      "name": "Anthropology",
+      "family_id": "social_sciences",
+      "family": "Social Sciences",
+      "description": "Anthropology. Social Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_anthropology"
+    },
+    {
+      "id": "political_science",
+      "name": "Political science",
+      "family_id": "social_sciences",
+      "family": "Social Sciences",
+      "description": "Political science. Social Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_political_science"
+    },
+    {
+      "id": "human_geography",
+      "name": "Human geography",
+      "family_id": "social_sciences",
+      "family": "Social Sciences",
+      "description": "Human geography. Social Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_human_geography"
+    },
+    {
+      "id": "communication_studies",
+      "name": "Communication studies",
+      "family_id": "social_sciences",
+      "family": "Social Sciences",
+      "description": "Communication studies. Social Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_communication_studies"
+    },
+    {
+      "id": "criminology",
+      "name": "Criminology",
+      "family_id": "social_sciences",
+      "family": "Social Sciences",
+      "description": "Criminology. Social Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_criminology"
+    },
+    {
+      "id": "demography",
+      "name": "Demography",
+      "family_id": "social_sciences",
+      "family": "Social Sciences",
+      "description": "Demography. Social Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_demography"
+    },
+    {
+      "id": "international_relations",
+      "name": "International relations",
+      "family_id": "social_sciences",
+      "family": "Social Sciences",
+      "description": "International relations. Social Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_international_relations"
+    },
+    {
+      "id": "social_work",
+      "name": "Social work",
+      "family_id": "social_sciences",
+      "family": "Social Sciences",
+      "description": "Social work. Social Sciences subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_social_work"
+    },
+    {
+      "id": "journalism",
+      "name": "Journalism",
+      "family_id": "media",
+      "family": "Media and Communication",
+      "description": "Journalism: news reporting, journalists, newspapers, magazines, investigative reporting, current events, press coverage, editing, news articles, media and public information.",
+      "database_name": "searchengine_journalism"
+    },
+    {
+      "id": "digital_media",
+      "name": "Digital media",
+      "family_id": "media",
+      "family": "Media and Communication",
+      "description": "Digital media. Media and Communication subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_digital_media"
+    },
+    {
+      "id": "broadcasting",
+      "name": "Broadcasting",
+      "family_id": "media",
+      "family": "Media and Communication",
+      "description": "Broadcasting. Media and Communication subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_broadcasting"
+    },
+    {
+      "id": "public_relations",
+      "name": "Public relations",
+      "family_id": "media",
+      "family": "Media and Communication",
+      "description": "Public relations. Media and Communication subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_public_relations"
+    },
+    {
+      "id": "advertising",
+      "name": "Advertising",
+      "family_id": "media",
+      "family": "Media and Communication",
+      "description": "Advertising. Media and Communication subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_advertising"
+    },
+    {
+      "id": "media_production",
+      "name": "Media production",
+      "family_id": "media",
+      "family": "Media and Communication",
+      "description": "Media production. Media and Communication subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_media_production"
+    },
+    {
+      "id": "content_strategy",
+      "name": "Content strategy",
+      "family_id": "media",
+      "family": "Media and Communication",
+      "description": "Content strategy. Media and Communication subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_content_strategy"
+    },
+    {
+      "id": "media_literacy",
+      "name": "Media literacy",
+      "family_id": "media",
+      "family": "Media and Communication",
+      "description": "Media literacy. Media and Communication subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_media_literacy"
+    },
+    {
+      "id": "communication_technology",
+      "name": "Communication technology",
+      "family_id": "media",
+      "family": "Media and Communication",
+      "description": "Communication technology. Media and Communication subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_communication_technology"
+    },
+    {
+      "id": "publishing",
+      "name": "Publishing",
+      "family_id": "media",
+      "family": "Media and Communication",
+      "description": "Publishing: books, academic journals, scholarly periodicals, manuscripts, peer review, editorial work, magazine publishing, publishers, printing and distribution.",
+      "database_name": "searchengine_publishing"
+    },
+    {
+      "id": "sports_science",
+      "name": "Sports science",
+      "family_id": "sports",
+      "family": "Sports and Recreation",
+      "description": "Sports science: athletic performance, exercise physiology, sports training, coaching, competition, fitness testing, sports research and human movement.",
+      "database_name": "searchengine_sports_science"
+    },
+    {
+      "id": "exercise_physiology",
+      "name": "Exercise physiology",
+      "family_id": "sports",
+      "family": "Sports and Recreation",
+      "description": "Exercise physiology. Sports and Recreation subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_exercise_physiology"
+    },
+    {
+      "id": "athletic_training",
+      "name": "Athletic training",
+      "family_id": "sports",
+      "family": "Sports and Recreation",
+      "description": "Athletic training. Sports and Recreation subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_athletic_training"
+    },
+    {
+      "id": "team_sports",
+      "name": "Team sports",
+      "family_id": "sports",
+      "family": "Sports and Recreation",
+      "description": "Team sports: cricket, football, soccer, basketball, baseball, hockey, match results, teams, leagues, tournaments and game rules.",
+      "database_name": "searchengine_team_sports"
+    },
+    {
+      "id": "individual_sports",
+      "name": "Individual sports",
+      "family_id": "sports",
+      "family": "Sports and Recreation",
+      "description": "Individual sports. Sports and Recreation subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_individual_sports"
+    },
+    {
+      "id": "sports_psychology",
+      "name": "Sports psychology",
+      "family_id": "sports",
+      "family": "Sports and Recreation",
+      "description": "Sports psychology. Sports and Recreation subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_sports_psychology"
+    },
+    {
+      "id": "sports_medicine",
+      "name": "Sports medicine",
+      "family_id": "sports",
+      "family": "Sports and Recreation",
+      "description": "Sports medicine. Sports and Recreation subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_sports_medicine"
+    },
+    {
+      "id": "outdoor_recreation",
+      "name": "Outdoor recreation",
+      "family_id": "sports",
+      "family": "Sports and Recreation",
+      "description": "Outdoor recreation. Sports and Recreation subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_outdoor_recreation"
+    },
+    {
+      "id": "sports_management",
+      "name": "Sports management",
+      "family_id": "sports",
+      "family": "Sports and Recreation",
+      "description": "Sports management. Sports and Recreation subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_sports_management"
+    },
+    {
+      "id": "physical_education",
+      "name": "Physical education",
+      "family_id": "sports",
+      "family": "Sports and Recreation",
+      "description": "Physical education. Sports and Recreation subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_physical_education"
+    },
+    {
+      "id": "automotive_technology",
+      "name": "Automotive technology",
+      "family_id": "mobility",
+      "family": "Transportation and Mobility",
+      "description": "Automotive technology. Transportation and Mobility subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_automotive_technology"
+    },
+    {
+      "id": "electric_vehicles",
+      "name": "Electric vehicles",
+      "family_id": "mobility",
+      "family": "Transportation and Mobility",
+      "description": "Electric vehicles. Transportation and Mobility subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_electric_vehicles"
+    },
+    {
+      "id": "rail_transport",
+      "name": "Rail transport",
+      "family_id": "mobility",
+      "family": "Transportation and Mobility",
+      "description": "Rail transport. Transportation and Mobility subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_rail_transport"
+    },
+    {
+      "id": "aviation",
+      "name": "Aviation",
+      "family_id": "mobility",
+      "family": "Transportation and Mobility",
+      "description": "Aviation. Transportation and Mobility subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_aviation"
+    },
+    {
+      "id": "maritime_transport",
+      "name": "Maritime transport",
+      "family_id": "mobility",
+      "family": "Transportation and Mobility",
+      "description": "Maritime transport. Transportation and Mobility subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_maritime_transport"
+    },
+    {
+      "id": "public_transit",
+      "name": "Public transit",
+      "family_id": "mobility",
+      "family": "Transportation and Mobility",
+      "description": "Public transit. Transportation and Mobility subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_public_transit"
+    },
+    {
+      "id": "traffic_engineering",
+      "name": "Traffic engineering",
+      "family_id": "mobility",
+      "family": "Transportation and Mobility",
+      "description": "Traffic engineering. Transportation and Mobility subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_traffic_engineering"
+    },
+    {
+      "id": "logistics",
+      "name": "Logistics",
+      "family_id": "mobility",
+      "family": "Transportation and Mobility",
+      "description": "Logistics. Transportation and Mobility subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_logistics"
+    },
+    {
+      "id": "autonomous_vehicles",
+      "name": "Autonomous vehicles",
+      "family_id": "mobility",
+      "family": "Transportation and Mobility",
+      "description": "Autonomous vehicles. Transportation and Mobility subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_autonomous_vehicles"
+    },
+    {
+      "id": "urban_mobility",
+      "name": "Urban mobility",
+      "family_id": "mobility",
+      "family": "Transportation and Mobility",
+      "description": "Urban mobility. Transportation and Mobility subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_urban_mobility"
+    },
+    {
+      "id": "cloud_computing",
+      "name": "Cloud computing",
+      "family_id": "computing_infra",
+      "family": "Computing Infrastructure",
+      "description": "Cloud computing. Computing Infrastructure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_cloud_computing"
+    },
+    {
+      "id": "computer_networks",
+      "name": "Computer networks",
+      "family_id": "computing_infra",
+      "family": "Computing Infrastructure",
+      "description": "Computer networks. Computing Infrastructure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_computer_networks"
+    },
+    {
+      "id": "cybersecurity",
+      "name": "Cybersecurity",
+      "family_id": "computing_infra",
+      "family": "Computing Infrastructure",
+      "description": "Cybersecurity. Computing Infrastructure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_cybersecurity"
+    },
+    {
+      "id": "operating_systems",
+      "name": "Operating systems",
+      "family_id": "computing_infra",
+      "family": "Computing Infrastructure",
+      "description": "Operating systems. Computing Infrastructure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_operating_systems"
+    },
+    {
+      "id": "devops_and_sre",
+      "name": "DevOps and SRE",
+      "family_id": "computing_infra",
+      "family": "Computing Infrastructure",
+      "description": "DevOps and SRE. Computing Infrastructure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_devops_and_sre"
+    },
+    {
+      "id": "distributed_systems",
+      "name": "Distributed systems",
+      "family_id": "computing_infra",
+      "family": "Computing Infrastructure",
+      "description": "Distributed systems. Computing Infrastructure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_distributed_systems"
+    },
+    {
+      "id": "hardware_and_semiconductors",
+      "name": "Hardware and semiconductors",
+      "family_id": "computing_infra",
+      "family": "Computing Infrastructure",
+      "description": "Hardware and semiconductors. Computing Infrastructure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_hardware_and_semiconductors"
+    },
+    {
+      "id": "telecommunications",
+      "name": "Telecommunications",
+      "family_id": "computing_infra",
+      "family": "Computing Infrastructure",
+      "description": "Telecommunications. Computing Infrastructure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_telecommunications"
+    },
+    {
+      "id": "internet_infrastructure",
+      "name": "Internet infrastructure",
+      "family_id": "computing_infra",
+      "family": "Computing Infrastructure",
+      "description": "Internet infrastructure. Computing Infrastructure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_internet_infrastructure"
+    },
+    {
+      "id": "it_service_management",
+      "name": "IT service management",
+      "family_id": "computing_infra",
+      "family": "Computing Infrastructure",
+      "description": "IT service management. Computing Infrastructure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_it_service_management"
+    },
+    {
+      "id": "travel_and_tourism",
+      "name": "Travel and tourism",
+      "family_id": "life_leisure",
+      "family": "Everyday Life and Leisure",
+      "description": "Travel and tourism. Everyday Life and Leisure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_travel_and_tourism"
+    },
+    {
+      "id": "personal_wellness",
+      "name": "Personal wellness",
+      "family_id": "life_leisure",
+      "family": "Everyday Life and Leisure",
+      "description": "Personal wellness. Everyday Life and Leisure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_personal_wellness"
+    },
+    {
+      "id": "home_improvement",
+      "name": "Home improvement",
+      "family_id": "life_leisure",
+      "family": "Everyday Life and Leisure",
+      "description": "Home improvement. Everyday Life and Leisure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_home_improvement"
+    },
+    {
+      "id": "consumer_technology",
+      "name": "Consumer technology",
+      "family_id": "life_leisure",
+      "family": "Everyday Life and Leisure",
+      "description": "Consumer technology. Everyday Life and Leisure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_consumer_technology"
+    },
+    {
+      "id": "parenting_and_family",
+      "name": "Parenting and family",
+      "family_id": "life_leisure",
+      "family": "Everyday Life and Leisure",
+      "description": "Parenting and family. Everyday Life and Leisure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_parenting_and_family"
+    },
+    {
+      "id": "pets_and_veterinary_care",
+      "name": "Pets and veterinary care",
+      "family_id": "life_leisure",
+      "family": "Everyday Life and Leisure",
+      "description": "Pets and veterinary care. Everyday Life and Leisure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_pets_and_veterinary_care"
+    },
+    {
+      "id": "cooking_and_culinary_arts",
+      "name": "Cooking and culinary arts",
+      "family_id": "life_leisure",
+      "family": "Everyday Life and Leisure",
+      "description": "Cooking and culinary arts. Everyday Life and Leisure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_cooking_and_culinary_arts"
+    },
+    {
+      "id": "personal_productivity",
+      "name": "Personal productivity",
+      "family_id": "life_leisure",
+      "family": "Everyday Life and Leisure",
+      "description": "Personal productivity. Everyday Life and Leisure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_personal_productivity"
+    },
+    {
+      "id": "fashion_and_beauty",
+      "name": "Fashion and beauty",
+      "family_id": "life_leisure",
+      "family": "Everyday Life and Leisure",
+      "description": "Fashion and beauty. Everyday Life and Leisure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_fashion_and_beauty"
+    },
+    {
+      "id": "recreation_and_hobbies",
+      "name": "Recreation and hobbies",
+      "family_id": "life_leisure",
+      "family": "Everyday Life and Leisure",
+      "description": "Recreation and hobbies. Everyday Life and Leisure subject area covering foundational concepts, current practices, tools, methods, applications, evidence, and research.",
+      "database_name": "searchengine_recreation_and_hobbies"
+    }
+  ]
+}

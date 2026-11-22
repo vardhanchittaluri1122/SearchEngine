@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -16,16 +17,10 @@ import (
 const maxBodyBytes = 1 << 20
 
 var cLanguagePattern = regexp.MustCompile(`(?i)\bc\+\+|\bc#|\bc\b`)
-var healthQueryTerms = []string{
-	"health", "healthcare", "medical", "medicine", "heart", "heartattack",
-	"cardiac", "cardiovascular", "stroke", "bloodpressure", "diabetes",
-	"cancer", "symptom", "disease", "treatment", "diagnosis", "doctor",
-	"hospital", "clinic", "vaccine", "infection", "fever", "pregnancy",
-	"nutrition", "therapy", "patient", "wellness",
-}
 
 type server struct {
 	crawlerURLs  map[string]string
+	crawlerURL   string
 	discoveryURL string
 	embeddingURL string
 	client       *http.Client
@@ -40,12 +35,27 @@ type domainCandidate struct {
 	Similarity      float32 `json:"similarity,omitempty"`
 }
 
+type candidateURL struct {
+	URL             string `json:"url"`
+	Domain          string `json:"domain"`
+	MatchScore      int    `json:"match_score,omitempty"`
+	DiscoverySource string `json:"discovery_source,omitempty"`
+}
+
+type commonCrawlDiscovery struct {
+	CrawlID       string            `json:"crawl_id"`
+	Domains       []domainCandidate `json:"domains"`
+	CandidateURLs []candidateURL    `json:"candidate_urls"`
+	Method        string            `json:"method"`
+}
+
 type indexedURLEmbedding struct {
 	URL       string    `json:"url"`
 	Embedding []float64 `json:"embedding"`
 }
 
 func main() {
+	sharedCrawlerURL := strings.TrimRight(env("CRAWLER_SERVICE_URL", ""), "/")
 	legacyCrawlerURL := env("CRAWLER_SERVICE_URL", "http://localhost:8081/api/v1/search")
 	crawlerURLs := map[string]string{
 		"technology": env("CRAWLER_TECHNOLOGY_URL", legacyCrawlerURL),
@@ -53,14 +63,15 @@ func main() {
 	}
 	discoveryURL := env("COMMONCRAWL_DISCOVERY_URL", "http://localhost:8000/internal/v1/commoncrawl/discover")
 	embeddingURL := env("COMMONCRAWL_EMBED_URLS", "http://localhost:8000/internal/v1/commoncrawl/embed-urls")
-	s := &server{crawlerURLs: crawlerURLs, discoveryURL: discoveryURL, embeddingURL: embeddingURL, client: &http.Client{Timeout: 30 * time.Minute}}
+	s := &server{crawlerURLs: crawlerURLs, crawlerURL: sharedCrawlerURL, discoveryURL: discoveryURL, embeddingURL: embeddingURL, client: &http.Client{Timeout: 30 * time.Minute}}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", s.health)
 	mux.HandleFunc("POST /api/v1/search", s.search)
+	mux.HandleFunc("GET /api/v1/crawl-jobs/{job_id}", s.crawlJobStatus)
 	mux.HandleFunc("POST /api/v1/pages/extract", s.extractPage)
 	// Render provides PORT; retain :8080 for local development.
 	addr := env("LISTEN_ADDR", ":"+env("PORT", "8080"))
-	log.Printf("Go orchestrator listening on %s; technology crawler=%s; health crawler=%s; discovery=%s; embedding=%s", addr, crawlerURLs["technology"], crawlerURLs["health"], discoveryURL, embeddingURL)
+	log.Printf("Go orchestrator listening on %s; shared crawler=%s; technology crawler=%s; health crawler=%s; discovery=%s; embedding=%s", addr, sharedCrawlerURL, crawlerURLs["technology"], crawlerURLs["health"], discoveryURL, embeddingURL)
 	if err := http.ListenAndServe(addr, mux); err != nil {
 		log.Fatal(err)
 	}
@@ -70,8 +81,8 @@ func (s *server) health(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "healthy", "service": "go-orchestrator"})
 }
 
-// Return stored matches immediately. Rust checks matching registered domains
-// and crawls them before asking Python to perform any Common Crawl discovery.
+// Return stored matches immediately. If there are no matches, expose candidate
+// domains and enqueue a persistent Rust crawl job instead of waiting on CDX.
 func (s *server) search(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	data, err := io.ReadAll(io.LimitReader(r.Body, maxBodyBytes+1))
@@ -89,26 +100,26 @@ func (s *server) search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Route from the query text as well as Python's classification. This catches
-	// clear health terms when a sentence embedding picks the wrong sector.
+	// The Python embedding classifier selects the sector and database. Go only
+	// forwards that decision to the shared Rust service.
 	queryText := stringValue(analysis["normalized_query"])
 	if strings.TrimSpace(queryText) == "" {
 		queryText = stringValue(analysis["original_query"])
 	}
 	keywords := preserveLanguageKeywords(analysis["keywords"], queryText)
 	analysis["keywords"] = keywords
-	sector := strings.ToLower(strings.TrimSpace(stringValue(analysis["sector"])))
+	sectorGroup := strings.ToLower(strings.TrimSpace(stringValue(analysis["sector_group"])))
+	if sectorGroup == "" {
+		sectorGroup = strings.ToLower(strings.TrimSpace(stringValue(analysis["sector"])))
+	}
 	databaseTarget := "technology"
-	healthOverride := hasHealthSignal(queryText, keywords) && sector != "health"
-	if hasHealthSignal(queryText, keywords) || sector == "health" {
+	if sectorGroup == "health" {
 		databaseTarget = "health"
 	}
-	if healthOverride {
-		analysis["sector_routing_reason"] = "health terms found in query; Go corrected the Python sector"
-	}
 	analysis["database_target"] = databaseTarget
-	analysis["sector"] = databaseTarget
-	analysis["metadata_only"] = true
+	analysis["sector_group"] = databaseTarget
+	analysis["metadata_only"] = false
+	analysis["defer_crawl"] = true
 	if plan, ok := analysis["search_plan"].(map[string]any); ok {
 		plan["source"] = databaseTarget
 		plan["strategy"] = "database_then_common_crawl_url_metadata"
@@ -120,6 +131,9 @@ func (s *server) search(w http.ResponseWriter, r *http.Request) {
 	}
 	responseAnalysis := routedBody
 	crawlerURL := s.crawlerURLs[databaseTarget]
+	if s.crawlerURL != "" {
+		crawlerURL = s.crawlerURL
+	}
 
 	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Minute)
 	defer cancel()
@@ -180,17 +194,79 @@ func (s *server) search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if hasSemanticCandidates(dbResult) {
-		s.respond(w, responseAnalysis, dbBody, map[string]any{
+		candidates := parseDomainCandidates(dbResult["candidate_domains"])
+		var candidateURLs []candidateURL
+		discovery := map[string]any{
 			"method":  "pgvector-domain-and-url-embeddings",
 			"message": "Candidates were ranked from the persistent Common Crawl embedding index.",
-		})
+		}
+		// A broad domain embedding may favor a name such as "macecricket.com"
+		// while missing a topic page on Wikipedia. For sports, supplement vector
+		// candidates with known reference domains, then let Rust score page URLs.
+		topic := strings.ToLower(strings.TrimSpace(stringValue(analysis["sector_id"])))
+		if topic == "team_sports" || topic == "individual_sports" {
+			body, code, discoveryErr := s.postJSON(ctx, s.discoveryURL, responseAnalysis)
+			if discoveryErr == nil && code >= 200 && code < 300 {
+				var result commonCrawlDiscovery
+				if json.Unmarshal(body, &result) == nil {
+					merged := make([]domainCandidate, 0, len(result.Domains)+len(candidates))
+					seen := make(map[string]bool)
+					for _, candidate := range append(result.Domains, candidates...) {
+						key := strings.ToLower(strings.TrimSpace(candidate.Domain))
+						if key != "" && !seen[key] {
+							candidate.Domain = key
+							merged = append(merged, candidate)
+							seen[key] = true
+						}
+					}
+					candidates = merged
+					candidateURLs = result.CandidateURLs
+					discovery = map[string]any{
+						"method":         result.Method,
+						"crawl_id":       result.CrawlID,
+						"domains":        candidates,
+						"candidate_urls": candidateURLs,
+						"message":        "Topic reference domains and semantic candidates are queued for page-level matching.",
+					}
+				}
+			}
+		}
+		s.enqueueCrawl(w, ctx, crawlerURL, analysis, responseAnalysis, dbResult, candidates, discovery)
 		return
 	}
 	if registered, ok := dbResult["registered_domains"].([]any); ok && len(registered) > 0 {
-		s.respond(w, responseAnalysis, dbBody, map[string]any{
-			"method":  "postgres-registered-domains",
-			"domains": registered,
-			"message": "Related registered domains were crawled; returning the database result.",
+		candidates := parseDomainCandidates(dbResult["candidate_domains"])
+		if len(candidates) == 0 {
+			for _, value := range registered {
+				if domain, ok := value.(string); ok && strings.TrimSpace(domain) != "" {
+					candidates = append(candidates, domainCandidate{Domain: domain, DiscoverySource: "postgres_registered_domain"})
+				}
+			}
+		}
+		discovery := map[string]any{"method": "postgres-registered-domains", "domains": candidates}
+		body, code, discoveryErr := s.postJSON(ctx, s.discoveryURL, responseAnalysis)
+		if discoveryErr == nil && code >= 200 && code < 300 {
+			var result commonCrawlDiscovery
+			if json.Unmarshal(body, &result) == nil {
+				seen := make(map[string]bool)
+				merged := make([]domainCandidate, 0, len(candidates)+len(result.Domains))
+				for _, candidate := range append(candidates, result.Domains...) {
+					key := strings.ToLower(strings.TrimSpace(candidate.Domain))
+					if key != "" && !seen[key] {
+						candidate.Domain = key
+						merged = append(merged, candidate)
+						seen[key] = true
+					}
+				}
+				candidates = merged
+				discovery = map[string]any{"method": result.Method, "crawl_id": result.CrawlID, "domains": candidates, "candidate_urls": result.CandidateURLs}
+			}
+		}
+		s.enqueueCrawl(w, ctx, crawlerURL, analysis, responseAnalysis, dbResult, candidates, map[string]any{
+			"method":         "postgres-registered-domains",
+			"domains":        candidates,
+			"message":        "Related registered domains were found. Common Crawl URL lookup is queued.",
+			"candidate_urls": discovery["candidate_urls"],
 		})
 		return
 	}
@@ -201,11 +277,7 @@ func (s *server) search(w http.ResponseWriter, r *http.Request) {
 		s.respond(w, responseAnalysis, dbBody, map[string]any{"status": "unavailable", "message": "Parquet URL-index domain discovery failed; returning database matches."})
 		return
 	}
-	var discovery struct {
-		CrawlID string            `json:"crawl_id"`
-		Domains []domainCandidate `json:"domains"`
-		Method  string            `json:"method"`
-	}
+	var discovery commonCrawlDiscovery
 	if err := json.Unmarshal(discoveryBody, &discovery); err != nil {
 		writeError(w, http.StatusBadGateway, "Python discovery service returned invalid JSON")
 		return
@@ -218,7 +290,7 @@ func (s *server) search(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if len(candidates) == 0 {
-		s.respond(w, responseAnalysis, dbBody, map[string]any{"crawl_id": discovery.CrawlID, "domains": []string{}, "message": "No candidate domains matched the query in Common Crawl's URL index."})
+		s.respond(w, responseAnalysis, dbBody, map[string]any{"crawl_id": discovery.CrawlID, "domains": []string{}, "candidate_urls": discovery.CandidateURLs, "message": "No candidate domains matched the query in Common Crawl's URL index."})
 		return
 	}
 
@@ -226,22 +298,102 @@ func (s *server) search(w http.ResponseWriter, r *http.Request) {
 	if discovery.CrawlID != "" {
 		analysis["index_collection"] = discovery.CrawlID
 	}
-	crawlRequest, err := json.Marshal(analysis)
+	s.enqueueCrawl(w, ctx, crawlerURL, analysis, responseAnalysis, dbResult, candidates,
+		map[string]any{"method": discovery.Method, "crawl_id": discovery.CrawlID, "domains": candidates, "candidate_urls": discovery.CandidateURLs})
+}
+
+func parseDomainCandidates(value any) []domainCandidate {
+	data, err := json.Marshal(value)
+	if err != nil || string(data) == "null" {
+		return nil
+	}
+	var candidates []domainCandidate
+	if json.Unmarshal(data, &candidates) != nil {
+		return nil
+	}
+	return candidates
+}
+
+func (s *server) enqueueCrawl(w http.ResponseWriter, ctx context.Context, crawlerURL string, analysis map[string]any, responseAnalysis []byte, searchResult map[string]any, candidates []domainCandidate, discovery any) {
+	if len(candidates) == 0 {
+		s.respond(w, responseAnalysis, mustJSON(searchResult), discovery)
+		return
+	}
+	analysis["candidate_domains"] = candidates
+	analysis["metadata_only"] = false
+	analysis["defer_crawl"] = false
+	jobPayload, err := json.Marshal(analysis)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "Could not prepare candidate crawl request")
+		writeError(w, http.StatusInternalServerError, "Could not prepare Common Crawl job")
 		return
 	}
-	crawlBody, crawlStatus, err := s.postJSON(ctx, crawlerURL, crawlRequest)
+	jobURL := strings.TrimSuffix(crawlerURL, "/api/v1/search") + "/api/v1/crawl-jobs"
+	jobBody, status, err := s.postJSON(ctx, jobURL, jobPayload)
+	if err != nil || status < 200 || status >= 300 {
+		log.Printf("Could not queue Common Crawl crawl job: status=%d error=%v", status, err)
+		searchResult["crawl_status"] = "unavailable"
+		searchResult["message"] = "Candidate domains were found, but the background crawl could not be queued."
+		s.respond(w, responseAnalysis, mustJSON(searchResult), discovery)
+		return
+	}
+	var job struct {
+		JobID  int64  `json:"job_id"`
+		Status string `json:"status"`
+	}
+	if err := json.Unmarshal(jobBody, &job); err != nil || job.JobID <= 0 {
+		writeError(w, http.StatusBadGateway, "Rust returned an invalid crawl job")
+		return
+	}
+	searchResult["candidate_domains"] = candidates
+	searchResult["crawl_job_id"] = job.JobID
+	searchResult["crawl_status"] = job.Status
+	searchResult["message"] = "Candidate domains are shown now. Common Crawl is finding and storing matching page URLs in the background."
+	s.respond(w, responseAnalysis, mustJSON(searchResult), discovery)
+}
+
+func mustJSON(value any) []byte {
+	data, _ := json.Marshal(value)
+	return data
+}
+
+func (s *server) crawlJobStatus(w http.ResponseWriter, r *http.Request) {
+	jobID := r.PathValue("job_id")
+	if jobID == "" || strings.Trim(jobID, "0123456789") != "" {
+		writeError(w, http.StatusBadRequest, "job_id must be numeric")
+		return
+	}
+	query := r.URL.Query()
+	base := s.crawlerURL
+	if base == "" {
+		group := query.Get("sector_group")
+		if group != "health" {
+			group = "technology"
+		}
+		base = strings.TrimSuffix(s.crawlerURLs[group], "/api/v1/search")
+	} else {
+		base = strings.TrimSuffix(base, "/api/v1/search")
+	}
+	values := url.Values{}
+	values.Set("database_name", query.Get("database_name"))
+	values.Set("sector_group", query.Get("sector_group"))
+	endpoint := base + "/api/v1/crawl-jobs/" + jobID + "?" + values.Encode()
+	request, err := http.NewRequestWithContext(r.Context(), http.MethodGet, endpoint, nil)
 	if err != nil {
-		log.Printf("Rust candidate crawl failed: %v", err)
-		writeError(w, http.StatusBadGateway, "Rust crawler failed to process candidate domains")
+		writeError(w, http.StatusInternalServerError, "Could not prepare crawl status request")
 		return
 	}
-	if crawlStatus < 200 || crawlStatus >= 300 {
-		writeJSON(w, crawlStatus, json.RawMessage(crawlBody))
+	response, err := s.client.Do(request)
+	if err != nil {
+		writeError(w, http.StatusBadGateway, "Rust crawl status service is unavailable")
 		return
 	}
-	s.respond(w, responseAnalysis, crawlBody, map[string]any{"method": discovery.Method, "crawl_id": discovery.CrawlID, "domains": candidates})
+	defer response.Body.Close()
+	body, err := io.ReadAll(io.LimitReader(response.Body, 4<<20))
+	if err != nil || len(body) >= 4<<20 || !json.Valid(body) {
+		writeError(w, http.StatusBadGateway, "Rust returned invalid crawl status JSON")
+		return
+	}
+	writeJSON(w, response.StatusCode, json.RawMessage(body))
 }
 
 func preserveLanguageKeywords(raw any, query string) []string {
@@ -263,17 +415,6 @@ func preserveLanguageKeywords(raw any, query string) []string {
 		}
 	}
 	return keywords
-}
-
-func hasHealthSignal(query string, keywords []string) bool {
-	combined := strings.ToLower(query + " " + strings.Join(keywords, " "))
-	compact := regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(combined, "")
-	for _, term := range healthQueryTerms {
-		if strings.Contains(compact, term) {
-			return true
-		}
-	}
-	return false
 }
 
 func containsString(values []string, target string) bool {
@@ -308,6 +449,9 @@ func (s *server) extractPage(w http.ResponseWriter, r *http.Request) {
 		target = "health"
 	}
 	crawlerURL := s.crawlerURLs[target]
+	if s.crawlerURL != "" {
+		crawlerURL = s.crawlerURL
+	}
 	extractURL := strings.TrimSuffix(crawlerURL, "/api/v1/search") + "/api/v1/pages/extract"
 	ctx, cancel := context.WithTimeout(r.Context(), 3*time.Minute)
 	defer cancel()

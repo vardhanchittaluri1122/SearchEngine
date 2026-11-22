@@ -14,6 +14,7 @@ import logging
 import os
 import sys
 import time
+import json
 from pathlib import Path
 from typing import Any
 
@@ -26,15 +27,13 @@ LOG = logging.getLogger("commoncrawl-indexer")
 COLLINFO_URL = "https://index.commoncrawl.org/collinfo.json"
 MANIFEST_BASE = "https://data.commoncrawl.org/crawl-data"
 DATA_BASE = "https://data.commoncrawl.org/"
-SECTOR_DESCRIPTIONS = {
-    "technology": (
-        "Technology and computer science: programming languages, software development, "
-        "databases, AI, cloud computing, networking, hardware, DevOps and engineering."
-    ),
-    "health": (
-        "Health and medicine: healthcare, diseases, symptoms, diagnosis, treatment, "
-        "medical research, hospitals, public health, nutrition and patient care."
-    ),
+SECTOR_FILE = Path(__file__).resolve().parents[1] / "data" / "sectors.json"
+SECTOR_CATALOG = json.loads(SECTOR_FILE.read_text(encoding="utf-8"))["sectors"]
+SECTOR_BY_ID = {item["id"]: item for item in SECTOR_CATALOG}
+SECTOR_DESCRIPTIONS = {item["id"]: item["description"] for item in SECTOR_CATALOG}
+FAMILY_GROUPS = {
+    "technology": {"programming_software", "ai_data", "engineering", "computing_infra"},
+    "health": {"health_medicine", "biology"},
 }
 DOMAIN_COLUMNS = (
     "url_host_registered_domain",
@@ -213,15 +212,16 @@ def _parquet_shards(client: httpx.Client, collection: str) -> list[tuple[str, st
 
 
 def _targets(sector: str) -> dict[str, str]:
-    configured = {
-        "technology": os.getenv("RUST_TECHNOLOGY_URL", "http://localhost:8081"),
-        "health": os.getenv("RUST_HEALTH_URL", "http://localhost:8082"),
-    }
+    base_url = os.getenv("RUST_SERVICE_URL", "http://localhost:8081").rstrip("/")
     if sector == "both":
-        return configured
-    if sector not in configured:
-        raise ValueError("--sector must be technology, health, or both")
-    return {sector: configured[sector]}
+        selected_ids = list(SECTOR_BY_ID)
+    elif sector in FAMILY_GROUPS:
+        selected_ids = [item["id"] for item in SECTOR_CATALOG if item["family_id"] in FAMILY_GROUPS[sector]]
+    elif sector in SECTOR_BY_ID:
+        selected_ids = [sector]
+    else:
+        raise ValueError("--sector must be technology, health, both, or a sector id from sectors.json")
+    return {sector_id: base_url for sector_id in selected_ids}
 
 
 def _progress(client: httpx.Client, base_url: str, collection: str, sector: str) -> set[str]:
@@ -279,16 +279,17 @@ def run(args: argparse.Namespace) -> None:
 
         sector_vectors_list = embed_texts(list(SECTOR_DESCRIPTIONS.values()), batch_size=8)
         sector_vectors = dict(zip(SECTOR_DESCRIPTIONS.keys(), sector_vectors_list))
-        for sector, base_url in target_urls.items():
-            response = rust_client.post(
-                f"{base_url}/internal/v1/index/sectors",
-                json={
-                    "sectors": [
-                        {"sector": sector, "description": SECTOR_DESCRIPTIONS[sector], "embedding": sector_vectors[sector]}
-                    ]
-                },
-            )
-            response.raise_for_status()
+        base_url = next(iter(target_urls.values()))
+        response = rust_client.post(
+            f"{base_url}/internal/v1/index/sectors",
+            json={
+                "sectors": [
+                    {"sector": sector, "description": SECTOR_DESCRIPTIONS[sector], "embedding": sector_vectors[sector]}
+                    for sector in target_urls
+                ]
+            },
+        )
+        response.raise_for_status()
 
         temp_directory = Path(args.temp_dir).resolve()
         temp_directory.mkdir(parents=True, exist_ok=True)
@@ -316,23 +317,23 @@ def run(args: argparse.Namespace) -> None:
                         texts = [_domain_text(domain, urls) for domain, urls in zip(domain_values, url_samples)]
                         vectors = embed_texts(texts, batch_size=args.embedding_batch_size)
                         scores = _cosine_scores(vectors, sector_vectors)
-
-                        for sector, base_url in target_urls.items():
-                            selected = []
-                            for i, (domain, urls, vector) in enumerate(zip(domain_values, url_samples, vectors)):
-                                score = scores[sector][i]
-                                if score < args.threshold:
-                                    continue
-                                selected.append({
-                                    "domain": domain,
-                                    "sector_score": score,
-                                    "embedding": vector,
-                                    "sample_urls": urls,
-                                })
+                        selected_by_sector: dict[str, list[dict[str, Any]]] = {sector: [] for sector in target_urls}
+                        for i, (domain, urls, vector) in enumerate(zip(domain_values, url_samples, vectors)):
+                            best_sector = max(target_urls, key=lambda candidate: scores[candidate][i])
+                            best_score = scores[best_sector][i]
+                            if best_score < args.threshold:
+                                continue
+                            selected_by_sector[best_sector].append({
+                                "domain": domain,
+                                "sector_score": best_score,
+                                "embedding": vector,
+                                "sample_urls": urls,
+                            })
+                        for sector, selected in selected_by_sector.items():
                             if selected:
                                 _post_batch(
                                     rust_client,
-                                    base_url,
+                                    target_urls[sector],
                                     {
                                         "collection": collection,
                                         "shard_path": path,
@@ -363,7 +364,7 @@ def run(args: argparse.Namespace) -> None:
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build a restartable Common Crawl domain embedding index")
     parser.add_argument("--snapshot", default=os.getenv("CC_INDEX_SNAPSHOT"), help="Common Crawl snapshot ID; default is latest")
-    parser.add_argument("--sector", choices=["technology", "health", "both"], default="both")
+    parser.add_argument("--sector", choices=["technology", "health", "both", *SECTOR_BY_ID.keys()], default="both")
     parser.add_argument("--max-files", type=int, default=0, help="Maximum shards to consider; 0 means all remaining shards")
     parser.add_argument("--batch-size", type=int, default=100, help="Domains returned from DuckDB and embedded per batch")
     parser.add_argument("--sample-urls", type=int, default=5, help="Representative URLs saved per domain per shard")
